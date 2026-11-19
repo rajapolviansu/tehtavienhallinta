@@ -1,10 +1,15 @@
 package fi.app.tehtavienhallinta;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * Lataa kehityskäyttöön testidatan, jos tietokanta on tyhjä.
@@ -12,8 +17,12 @@ import java.time.LocalDate;
 @Configuration
 public class TestDataLoader {
 
+    private static final Logger log = LoggerFactory.getLogger(TestDataLoader.class);
+
     @Bean
-    CommandLineRunner loadTestData(AppUserRepository users,
+    CommandLineRunner loadTestData(@Value("${APP_DEV_PASSWORD:}") String devPassword,
+                                   AppUserRepository users,
+                                   PasswordEncoder passwordEncoder,
                                    ProjectRepository projects,
                                    TaskRepository tasks,
                                    TagRepository tags) {
@@ -22,8 +31,16 @@ public class TestDataLoader {
                 return;
             }
 
-            users.save(new AppUser("ansu", "ansu@example.com"));
-            users.save(new AppUser("matti", "matti@example.com"));
+            // Salasanaa ei kirjoiteta koodiin: se tulee ympäristömuuttujasta APP_DEV_PASSWORD
+            // tai, jos sitä ei ole asetettu, generoidaan satunnaisesti ja tulostetaan lokiin.
+            String rawPassword = devPassword;
+            if (rawPassword == null || rawPassword.isBlank()) {
+                rawPassword = UUID.randomUUID().toString();
+                log.warn("Testikäyttäjien (ansu, matti) generoitu salasana: {}", rawPassword);
+            }
+            String hash = passwordEncoder.encode(rawPassword);
+            users.save(new AppUser("ansu", "ansu@example.com", hash));
+            users.save(new AppUser("matti", "matti@example.com", hash));
 
             Tag urgent = tag(tags, "kiireellinen", "#e53935");
             Tag bug = tag(tags, "bugi", "#fb8c00");

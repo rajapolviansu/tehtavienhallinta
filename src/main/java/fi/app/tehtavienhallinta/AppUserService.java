@@ -1,6 +1,7 @@
 package fi.app.tehtavienhallinta;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,20 +11,28 @@ import java.util.List;
 @Transactional
 public class AppUserService {
 
-    private final AppUserRepository users;
+    static final int MIN_PASSWORD_LENGTH = 8;
 
-    public AppUserService(AppUserRepository users) {
+    private final AppUserRepository users;
+    private final PasswordEncoder passwordEncoder;
+
+    public AppUserService(AppUserRepository users, PasswordEncoder passwordEncoder) {
         this.users = users;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public AppUser create(String username, String email) {
+    public AppUser create(String username, String email, String rawPassword) {
+        if (rawPassword == null || rawPassword.length() < MIN_PASSWORD_LENGTH) {
+            throw new IllegalArgumentException(
+                    "Salasanan tulee olla vähintään " + MIN_PASSWORD_LENGTH + " merkkiä pitkä");
+        }
         if (users.existsByUsername(username)) {
             throw new IllegalArgumentException("Käyttäjätunnus on jo käytössä: " + username);
         }
         if (users.existsByEmail(email)) {
             throw new IllegalArgumentException("Sähköposti on jo käytössä: " + email);
         }
-        return users.save(new AppUser(username, email));
+        return users.save(new AppUser(username, email, passwordEncoder.encode(rawPassword)));
     }
 
     @Transactional(readOnly = true)

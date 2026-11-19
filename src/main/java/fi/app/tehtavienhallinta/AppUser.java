@@ -34,6 +34,10 @@ public class AppUser {
     @Column(nullable = false, unique = true)
     private String email;
 
+    /** BCrypt-tiiviste. Salasanaa ei koskaan tallenneta selkotekstinä. */
+    @Column(nullable = false)
+    private String passwordHash;
+
     @Column(nullable = false, updatable = false)
     private Instant created = Instant.now();
 
@@ -41,9 +45,18 @@ public class AppUser {
         // JPA vaatii parametrittoman konstruktorin
     }
 
-    public AppUser(String username, String email) {
+    public AppUser(String username, String email, String passwordHash) {
         this.username = username;
         this.email = email;
+        this.passwordHash = passwordHash;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public Long getId() {
