@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@WithMockUser(roles = "ADMIN")
 class AppUserServiceTest {
 
     // Satunnainen salasana joka ajolla, ei kovakoodattua arvoa
@@ -88,6 +90,40 @@ class AppUserServiceTest {
         service.delete(u.getId());
 
         assertThrows(EntityNotFoundException.class, () -> service.get(u.getId()));
+    }
+
+    @Autowired
+    AppUserRepository repository;
+
+    @Test
+    void createDefaultsToUserRole() {
+        assertEquals(Role.USER, service.create("testaaja", "testaaja@example.com", PASSWORD).getRole());
+        assertEquals(Role.ADMIN,
+                service.create("yllapitaja", "yllapitaja@example.com", PASSWORD, Role.ADMIN).getRole());
+    }
+
+    @Test
+    void updateKeepsRoleUnlessChanged() {
+        AppUser u = service.create("testaaja", "testaaja@example.com", PASSWORD);
+
+        service.update(u.getId(), "testaaja", "uusi@example.com");
+        assertEquals(Role.USER, service.get(u.getId()).getRole());
+
+        service.update(u.getId(), "testaaja", "uusi@example.com", Role.ADMIN);
+        assertEquals(Role.ADMIN, service.get(u.getId()).getRole());
+    }
+
+    @Test
+    void lastAdminCannotBeDeletedOrDemoted() {
+        repository.deleteAll(); // rullataan takaisin testin lopussa
+        AppUser admin = service.create("yllapitaja", "yllapitaja@example.com", PASSWORD, Role.ADMIN);
+
+        assertThrows(IllegalArgumentException.class, () -> service.delete(admin.getId()));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.update(admin.getId(), "yllapitaja", "yllapitaja@example.com", Role.USER));
+
+        service.create("toinen", "toinen@example.com", PASSWORD, Role.ADMIN);
+        assertDoesNotThrow(() -> service.delete(admin.getId()));
     }
 
     @Test

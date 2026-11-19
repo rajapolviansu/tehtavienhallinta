@@ -39,8 +39,8 @@ public class TestDataLoader {
                 log.warn("Testikäyttäjien (ansu, matti) generoitu salasana: {}", rawPassword);
             }
             String hash = passwordEncoder.encode(rawPassword);
-            users.save(new AppUser("ansu", "ansu@example.com", hash));
-            users.save(new AppUser("matti", "matti@example.com", hash));
+            users.save(new AppUser("ansu", "ansu@example.com", hash, Role.ADMIN));
+            users.save(new AppUser("matti", "matti@example.com", hash, Role.USER));
 
             Tag urgent = tag(tags, "kiireellinen", "#e53935");
             Tag bug = tag(tags, "bugi", "#fb8c00");
