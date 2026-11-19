@@ -1,4 +1,4 @@
-package fi.example.app;
+package fi.app.tehtavienhallinta;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import org.springframework.boot.SpringApplication;

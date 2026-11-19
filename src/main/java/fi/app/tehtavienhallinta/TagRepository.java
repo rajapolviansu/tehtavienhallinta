@@ -1,4 +1,4 @@
-package fi.example.app;
+package fi.app.tehtavienhallinta;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,4 +1,4 @@
-package fi.example.app;
+package fi.app.tehtavienhallinta;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
