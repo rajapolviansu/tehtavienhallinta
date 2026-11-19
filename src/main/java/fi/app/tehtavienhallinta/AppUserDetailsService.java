@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Hakee kirjautuvan käyttäjän tietokannasta Spring Securityn käyttöön.
- * Kaikilla käyttäjillä on toistaiseksi sama rooli USER.
+ * Rooli (USER tai ADMIN) luetaan käyttäjältä.
  */
 @Service
 public class AppUserDetailsService implements UserDetailsService {
@@ -27,7 +27,7 @@ public class AppUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Käyttäjää ei löytynyt: " + username));
         return User.withUsername(user.getUsername())
                 .password(user.getPasswordHash())
-                .roles("USER")
+                .roles(user.getRole().name())
                 .build();
     }
 }
