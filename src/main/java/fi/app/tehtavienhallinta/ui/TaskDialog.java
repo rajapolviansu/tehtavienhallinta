@@ -8,8 +8,6 @@ import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -107,11 +105,10 @@ class TaskDialog extends Dialog {
                 tasks.update(existing.getId(), data, projectId, tagIds);
             }
         } catch (RuntimeException ex) {
-            Notification n = Notification.show("Tallennus epäonnistui: " + ex.getMessage());
-            n.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            Ui.error("Tallennus epäonnistui: " + ex.getMessage());
             return;
         }
-        Notification.show("Tehtävä tallennettu").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        Ui.success("Tehtävä tallennettu");
         close();
         onSaved.run();
     }
