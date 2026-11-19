@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -99,6 +100,33 @@ public class TaskService {
         Task task = get(taskId);
         task.removeTag(tags.get(tagId));
         return task;
+    }
+
+    /** Luo tehtävän projektiin ja asettaa sille tunnisteet yhdessä transaktiossa. */
+    public Task create(Long projectId, Task task, Set<Long> tagIds) {
+        Task saved = create(projectId, task);
+        syncTags(saved, tagIds);
+        return saved;
+    }
+
+    /** Päivittää tehtävän kentät, projektin ja tunnisteet yhdessä transaktiossa. */
+    public Task update(Long id, Task changes, Long projectId, Set<Long> tagIds) {
+        Task task = update(id, changes);
+        if (task.getProject() == null || !task.getProject().getId().equals(projectId)) {
+            moveToProject(id, projectId);
+        }
+        syncTags(task, tagIds);
+        return task;
+    }
+
+    private void syncTags(Task task, Set<Long> tagIds) {
+        task.getTags().stream()
+                .filter(t -> !tagIds.contains(t.getId()))
+                .toList()
+                .forEach(task::removeTag);
+        for (Long tagId : tagIds) {
+            task.addTag(tags.get(tagId));
+        }
     }
 
     public void delete(Long id) {

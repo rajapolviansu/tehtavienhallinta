@@ -2,7 +2,7 @@
 
 Tehtävienhallintasovellus, jolla hallitaan projekteja, tehtäviä ja tunnisteita. Tehty Vaadinilla ja Spring Bootilla. Java-kurssin harjoitustyö.
 
-> **Tila:** taustajärjestelmä ja kirjautuminen toimivat. Käyttöliittymässä on toistaiseksi vain otsikko.
+> **Tila:** taustajärjestelmä, kirjautuminen ja tehtävälista toimivat. Projektien ja tunnisteiden näkymät puuttuvat vielä.
 
 ## Teknologiat
 
@@ -71,7 +71,9 @@ Kaikki koodi on paketissa `src/main/java/fi/app/tehtavienhallinta/`.
 | `AppUserDetailsService` | Hakee kirjautuvan käyttäjän tietokannasta |
 | `TestDataLoader` | Lataa kehityksessä esimerkkidatan |
 | `ui/LoginView` | Kirjautumissivu |
-| `ui/MainView` | Pääsivu |
+| `ui/MainView` | Pääsivu: otsikko, uloskirjautuminen ja välilehdet |
+| `ui/TasksPanel` | Tehtävälista: haku, lisäys, muokkaus ja poisto |
+| `ui/TaskDialog` | Tehtävän lisäys- ja muokkauslomake |
 
 Asetukset ovat tiedostossa `src/main/resources/application.properties`.
 
@@ -86,8 +88,7 @@ Asetukset ovat tiedostossa `src/main/resources/application.properties`.
 
 ## Tekemättä
 
-- Uloskirjautuminen
-- Käyttöliittymä projektien, tehtävien ja tunnisteiden hallintaan
+- Käyttöliittymä projektien ja tunnisteiden hallintaan
 - Rekisteröityminen ja roolit (nyt kaikilla on sama rooli)
 - Projektien omistaminen käyttäjälle (nyt kaikki näkevät kaiken)
 - PostgreSQL-asetukset tuotantokäyttöön
