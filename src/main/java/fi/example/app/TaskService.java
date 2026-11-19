@@ -1,9 +1,11 @@
 package fi.example.app;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -39,6 +41,19 @@ public class TaskService {
     @Transactional(readOnly = true)
     public List<Task> findByTag(Long tagId) {
         return tasks.findByTagsId(tagId);
+    }
+
+    /** Hakee tehtävät annetuilla kriteereillä, eräpäivän mukaan järjestettynä. */
+    @Transactional(readOnly = true)
+    public List<Task> search(TaskFilter filter) {
+        return tasks.findAll(filter.toSpecification(),
+                Sort.by(Sort.Order.asc("dueDate"), Sort.Order.asc("id")));
+    }
+
+    /** Palauttaa myöhässä olevat (erääntyneet ja keskeneräiset) tehtävät. */
+    @Transactional(readOnly = true)
+    public List<Task> findOverdue(LocalDate today) {
+        return tasks.findAll(TaskSpecifications.overdue(today), Sort.by("dueDate"));
     }
 
     @Transactional(readOnly = true)
