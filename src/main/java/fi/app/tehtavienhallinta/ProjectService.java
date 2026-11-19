@@ -1,4 +1,4 @@
-package fi.example.app;
+package fi.app.tehtavienhallinta;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;

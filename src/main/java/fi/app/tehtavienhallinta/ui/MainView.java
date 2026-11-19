@@ -1,4 +1,4 @@
-package fi.example.app.ui;
+package fi.app.tehtavienhallinta.ui;
 
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;

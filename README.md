@@ -42,7 +42,7 @@ Tällä hetkellä testeissä on vain `ApplicationTests.contextLoads`, joka tarki
 ## Projektin rakenne
 
 ```
-src/main/java/fi/example/app/
+src/main/java/fi/app/tehtavienhallinta/
 ├── Application.java        Sovelluksen käynnistysluokka
 ├── Project.java            Projekti-entiteetti (nimi, kuvaus, päivämäärät, arkistointi)
 ├── ProjectRepository.java  Projektien repositorio
