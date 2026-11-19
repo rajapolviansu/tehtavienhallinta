@@ -1,6 +1,6 @@
 # Tehtävienhallinta
 
-Vaadin + Spring Boot -pohjainen tehtävienhallintasovellus (SPA).
+Vaadin + Spring Boot -pohjainen tehtävienhallintasovellus (SPA). Java-kurssin harjoitustyö.
 
 > **Tila:** projektin aloitettu. Näkymässä on toistaiseksi vain otsikko.
 
