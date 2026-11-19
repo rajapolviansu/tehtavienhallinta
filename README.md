@@ -7,7 +7,7 @@ Vaadin + Spring Boot -pohjainen tehtävienhallintasovellus (SPA).
 ## Teknologiat
 
 - Java 21
-- Spring Boot 4.0.2
+- Spring Boot 4.0.9
 - Vaadin 25.3.5
 - Spring Data JPA ja Bean Validation
 - H2 (muistitietokanta kehityksessä), PostgreSQL-ajuri mukana
