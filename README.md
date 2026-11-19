@@ -1,17 +1,18 @@
 # Tehtävienhallinta
 
-Vaadin + Spring Boot -pohjainen tehtävienhallintasovellus (SPA). Java-kurssin harjoitustyö.
+Tehtävienhallintasovellus, jolla hallitaan projekteja, tehtäviä ja tunnisteita. Tehty Vaadinilla ja Spring Bootilla. Java-kurssin harjoitustyö.
 
-> **Tila:** projektin aloitettu. Tietomalli (Project, Task) ja repositoriot on tehty, mutta näkymässä on toistaiseksi vain otsikko.
+> **Tila:** taustajärjestelmä ja kirjautuminen toimivat. Käyttöliittymässä on toistaiseksi vain otsikko.
 
 ## Teknologiat
 
 - Java 21
 - Spring Boot 4.0.9
 - Vaadin 25.3.5
+- Spring Security (kirjautuminen)
 - Spring Data JPA ja Bean Validation
-- H2 (muistitietokanta kehityksessä), PostgreSQL-ajuri mukana
-- Maven (mukana `mvnw` / `mvnw.cmd`)
+- H2-muistitietokanta kehityksessä, PostgreSQL-ajuri mukana
+- Maven (mukana `mvnw` ja `mvnw.cmd`)
 
 ## Käynnistys
 
@@ -27,9 +28,26 @@ Linux / macOS:
 ./mvnw spring-boot:run
 ```
 
-Sovellus avautuu osoitteeseen <http://localhost:8080>. Selainta ei avata automaattisesti (`vaadin.launch-browser=false`).
+Sovellus avautuu osoitteeseen <http://localhost:8080> ja ohjaa kirjautumissivulle.
 
-H2-konsoli on käytössä kehityksessä (`spring.h2.console.enabled=true`). JDBC-osoite on `jdbc:h2:mem:tehtavat`, käyttäjä `sa` ja salasana tyhjä.
+## Kirjautuminen
+
+Kehityksessä luodaan käynnistyksessä kaksi käyttäjää: `ansu` ja `matti`. Heillä on sama salasana, eikä sitä ole kirjoitettu koodiin:
+
+- Jos asetat ympäristömuuttujan `APP_DEV_PASSWORD`, salasana on sen arvo.
+- Muuten salasana arvotaan joka käynnistyksessä ja tulostetaan lokiin (rivi "generoitu salasana").
+
+PowerShellissä oman salasanan voi asettaa ennen käynnistystä:
+
+```powershell
+$env:APP_DEV_PASSWORD = "oma-salasana"
+```
+
+Salasanat tallennetaan tietokantaan vain tiivisteenä (BCrypt), ja niiden vähimmäispituus on 8 merkkiä.
+
+## Tietokanta
+
+H2-konsoli on käytössä kehityksessä osoitteessa `/h2-console`. JDBC-osoite on `jdbc:h2:mem:tehtavat`, käyttäjä `sa` ja salasana tyhjä. Tiedot häviävät, kun sovellus sammutetaan. Konsoli vaatii nyt kirjautumisen, ja sen toimivuus selaimessa on vielä tarkistamatta.
 
 ## Testit
 
@@ -37,32 +55,39 @@ H2-konsoli on käytössä kehityksessä (`spring.h2.console.enabled=true`). JDBC
 .\mvnw.cmd test
 ```
 
-Tällä hetkellä testeissä on vain `ApplicationTests.contextLoads`, joka tarkistaa että Spring-konteksti käynnistyy.
+Testit kattavat palvelut (käyttäjät, projektit, tehtävät, tunnisteet, haku) ja kirjautumisen.
 
 ## Projektin rakenne
 
-```
-src/main/java/fi/app/tehtavienhallinta/
-├── Application.java        Sovelluksen käynnistysluokka
-├── Project.java            Projekti-entiteetti (nimi, kuvaus, päivämäärät, arkistointi)
-├── ProjectRepository.java  Projektien repositorio
-├── Task.java               Tehtävä-entiteetti (kuuluu projektiin)
-├── TaskRepository.java     Tehtävien repositorio
-└── ui/
-    └── MainView.java       Ainoa näkymä (reitti "")
-src/main/resources/
-└── application.properties  Konfiguraatio (H2 kehityskäytössä)
-```
+Kaikki koodi on paketissa `src/main/java/fi/app/tehtavienhallinta/`.
+
+| Tiedosto | Tehtävä |
+| --- | --- |
+| `AppUser`, `Project`, `Task`, `Tag` | Tietomallin luokat |
+| `*Repository` | Tietokantahaut |
+| `*Service` | Sovelluksen toiminnot (lisäys, muokkaus, poisto, haku) |
+| `TaskFilter`, `TaskSpecifications` | Tehtävien suodatus |
+| `SecurityConfig` | Kirjautumisen asetukset |
+| `AppUserDetailsService` | Hakee kirjautuvan käyttäjän tietokannasta |
+| `TestDataLoader` | Lataa kehityksessä esimerkkidatan |
+| `ui/LoginView` | Kirjautumissivu |
+| `ui/MainView` | Pääsivu |
+
+Asetukset ovat tiedostossa `src/main/resources/application.properties`.
 
 ## Tietomalli
 
-- **Project**: `name` (pakollinen), `description`, `startDate`, `dueDate`, `archived`, `createdAt`, `updatedAt`. Aikaleimat asetetaan automaattisesti.
-- **Task**: `title` (pakollinen), `description`, `dueDate`, `done`.
-- Yhteys: yksi projekti sisältää monta tehtävää (`Project.tasks` ↔ `Task.project`). Projektin poisto poistaa myös sen tehtävät, ja projektista poistettu tehtävä poistuu tietokannasta.
+- **AppUser**: käyttäjätunnus, sähköposti ja salasanatiiviste. Käyttäjätunnus ja sähköposti ovat yksilöllisiä.
+- **Project**: nimi (pakollinen), kuvaus, alku- ja eräpäivä, arkistointi.
+- **Task**: otsikko (pakollinen), kuvaus, eräpäivä, valmis-tieto.
+- **Tag**: nimi ja väri.
+- Projektilla on monta tehtävää. Projektin poisto poistaa myös sen tehtävät.
+- Tehtävällä voi olla monta tunnistetta, ja tunniste voi olla monella tehtävällä.
 
 ## Tekemättä
 
-- Palvelukerros
-- Käyttöliittymä tehtävien listaukseen, lisäykseen, muokkaukseen ja poistoon
-- Välilehdet ja paneelit pääsivulle
+- Uloskirjautuminen
+- Käyttöliittymä projektien, tehtävien ja tunnisteiden hallintaan
+- Rekisteröityminen ja roolit (nyt kaikilla on sama rooli)
+- Projektien omistaminen käyttäjälle (nyt kaikki näkevät kaiken)
 - PostgreSQL-asetukset tuotantokäyttöön
