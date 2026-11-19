@@ -2,7 +2,7 @@
 
 Vaadin + Spring Boot -pohjainen tehtävienhallintasovellus (SPA). Java-kurssin harjoitustyö.
 
-> **Tila:** projektin aloitettu. Näkymässä on toistaiseksi vain otsikko.
+> **Tila:** projektin aloitettu. Tietomalli (Project, Task) ja repositoriot on tehty, mutta näkymässä on toistaiseksi vain otsikko.
 
 ## Teknologiat
 
@@ -44,15 +44,25 @@ Tällä hetkellä testeissä on vain `ApplicationTests.contextLoads`, joka tarki
 ```
 src/main/java/fi/example/app/
 ├── Application.java        Sovelluksen käynnistysluokka
+├── Project.java            Projekti-entiteetti (nimi, kuvaus, päivämäärät, arkistointi)
+├── ProjectRepository.java  Projektien repositorio
+├── Task.java               Tehtävä-entiteetti (kuuluu projektiin)
+├── TaskRepository.java     Tehtävien repositorio
 └── ui/
     └── MainView.java       Ainoa näkymä (reitti "")
 src/main/resources/
 └── application.properties  Konfiguraatio (H2 kehityskäytössä)
 ```
 
+## Tietomalli
+
+- **Project**: `name` (pakollinen), `description`, `startDate`, `dueDate`, `archived`, `createdAt`, `updatedAt`. Aikaleimat asetetaan automaattisesti.
+- **Task**: `title` (pakollinen), `description`, `dueDate`, `done`.
+- Yhteys: yksi projekti sisältää monta tehtävää (`Project.tasks` ↔ `Task.project`). Projektin poisto poistaa myös sen tehtävät, ja projektista poistettu tehtävä poistuu tietokannasta.
+
 ## Tekemättä
 
-- Tehtävä-entiteetti, repositorio ja palvelukerros
+- Palvelukerros
 - Käyttöliittymä tehtävien listaukseen, lisäykseen, muokkaukseen ja poistoon
 - Välilehdet ja paneelit pääsivulle
 - PostgreSQL-asetukset tuotantokäyttöön
