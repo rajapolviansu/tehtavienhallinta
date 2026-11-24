@@ -2,7 +2,7 @@
 
 Tehtävienhallintasovellus, jolla hallitaan projekteja, tehtäviä ja tunnisteita. Tehty Vaadinilla ja Spring Bootilla. Java-kurssin harjoitustyö.
 
-> **Tila:** taustajärjestelmä, kirjautuminen ja tehtävälista toimivat. Projektien ja tunnisteiden näkymät puuttuvat vielä.
+> **Tila:** taustajärjestelmä, kirjautuminen, roolit ja kaikki neljä näkymää (tehtävät, projektit, tunnisteet, käyttäjät) on tehty.
 
 ## Teknologiat
 
@@ -45,6 +45,8 @@ $env:APP_DEV_PASSWORD = "oma-salasana"
 
 Salasanat tallennetaan tietokantaan vain tiivisteenä (BCrypt), ja niiden vähimmäispituus on 8 merkkiä.
 
+Rooleja on kaksi: **USER** käyttää tehtäviä, projekteja ja tunnisteita, ja **ADMIN** hallinnoi lisäksi käyttäjiä (Käyttäjät-välilehti). `ansu` on ylläpitäjä ja `matti` tavallinen käyttäjä. Viimeistä ylläpitäjää ei voi poistaa eikä alentaa.
+
 ## Tietokanta
 
 H2-konsoli on käytössä kehityksessä osoitteessa `/h2-console`. JDBC-osoite on `jdbc:h2:mem:tehtavat`, käyttäjä `sa` ja salasana tyhjä. Tiedot häviävät, kun sovellus sammutetaan. Konsoli vaatii nyt kirjautumisen, ja sen toimivuus selaimessa on vielä tarkistamatta.
@@ -74,12 +76,16 @@ Kaikki koodi on paketissa `src/main/java/fi/app/tehtavienhallinta/`.
 | `ui/MainView` | Pääsivu: otsikko, uloskirjautuminen ja välilehdet |
 | `ui/TasksPanel` | Tehtävälista: haku, lisäys, muokkaus ja poisto |
 | `ui/TaskDialog` | Tehtävän lisäys- ja muokkauslomake |
+| `ui/ProjectsPanel`, `ui/ProjectDialog` | Projektilista ja projektin lomake |
+| `ui/TagsPanel`, `ui/TagDialog` | Tunnisteiden lista ja tunnisteen lomake |
+| `ui/UsersPanel`, `ui/UserDialog` | Käyttäjien hallinta (vain ylläpitäjälle) |
+| `ui/Ui` | Yhteiset ilmoitukset ja poistovahvistus |
 
 Asetukset ovat tiedostossa `src/main/resources/application.properties`.
 
 ## Tietomalli
 
-- **AppUser**: käyttäjätunnus, sähköposti ja salasanatiiviste. Käyttäjätunnus ja sähköposti ovat yksilöllisiä.
+- **AppUser**: käyttäjätunnus, sähköposti, salasanatiiviste ja rooli (USER tai ADMIN). Käyttäjätunnus ja sähköposti ovat yksilöllisiä.
 - **Project**: nimi (pakollinen), kuvaus, alku- ja eräpäivä, arkistointi.
 - **Task**: otsikko (pakollinen), kuvaus, eräpäivä, valmis-tieto.
 - **Tag**: nimi ja väri.
@@ -88,7 +94,7 @@ Asetukset ovat tiedostossa `src/main/resources/application.properties`.
 
 ## Tekemättä
 
-- Käyttöliittymä projektien ja tunnisteiden hallintaan
-- Rekisteröityminen ja roolit (nyt kaikilla on sama rooli)
+- Rekisteröityminen (käyttäjiä voi nyt lisätä vain ylläpitäjä)
+- Salasanan vaihto
 - Projektien omistaminen käyttäjälle (nyt kaikki näkevät kaiken)
 - PostgreSQL-asetukset tuotantokäyttöön

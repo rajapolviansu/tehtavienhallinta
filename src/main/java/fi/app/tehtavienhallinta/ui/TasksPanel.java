@@ -3,12 +3,9 @@ package fi.app.tehtavienhallinta.ui;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -112,7 +109,7 @@ public class TasksPanel extends VerticalLayout {
         })).setHeader("").setAutoWidth(true).setFlexGrow(0);
     }
 
-    private void refresh() {
+    void refresh() {
         String text = search.getValue() == null || search.getValue().isBlank()
                 ? null : search.getValue().trim();
         Boolean done = onlyOpen.getValue() ? Boolean.FALSE : null;
@@ -124,23 +121,8 @@ public class TasksPanel extends VerticalLayout {
     }
 
     private void confirmDelete(Task task) {
-        ConfirmDialog dialog = new ConfirmDialog();
-        dialog.setHeader("Poistetaanko tehtävä?");
-        dialog.setText("Tehtävä \"" + task.getTitle() + "\" poistetaan pysyvästi.");
-        dialog.setCancelable(true);
-        dialog.setCancelText("Peruuta");
-        dialog.setConfirmText("Poista");
-        dialog.setConfirmButtonTheme("error primary");
-        dialog.addConfirmListener(e -> {
-            try {
-                tasks.delete(task.getId());
-                Notification.show("Tehtävä poistettu").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            } catch (RuntimeException ex) {
-                Notification.show("Poisto epäonnistui: " + ex.getMessage())
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
-            }
-            refresh();
-        });
-        dialog.open();
+        Ui.confirmDelete("Poistetaanko tehtävä?",
+                "Tehtävä \"" + task.getTitle() + "\" poistetaan pysyvästi.",
+                () -> Ui.runDelete(() -> tasks.delete(task.getId()), "Tehtävä poistettu", this::refresh));
     }
 }

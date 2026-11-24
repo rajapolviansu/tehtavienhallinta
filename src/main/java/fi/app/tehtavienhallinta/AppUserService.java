@@ -16,7 +16,7 @@ import java.util.List;
 @PreAuthorize("hasRole('ADMIN')")
 public class AppUserService {
 
-    static final int MIN_PASSWORD_LENGTH = 8;
+    public static final int MIN_PASSWORD_LENGTH = 8;
 
     private final AppUserRepository users;
     private final PasswordEncoder passwordEncoder;
