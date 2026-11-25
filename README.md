@@ -2,7 +2,7 @@
 
 Tehtävienhallintasovellus, jolla hallitaan projekteja, tehtäviä ja tunnisteita. Tehty Vaadinilla ja Spring Bootilla. Java-kurssin harjoitustyö.
 
-> **Tila:** taustajärjestelmä, kirjautuminen, roolit ja kaikki neljä näkymää (tehtävät, projektit, tunnisteet, käyttäjät) on tehty.
+> **Tila:** taustajärjestelmä, kirjautuminen, roolit, kaikki neljä näkymää (tehtävät, projektit, tunnisteet, käyttäjät), käyttäjäprofiili ja validoinnit on tehty.
 
 ## Teknologiat
 
@@ -49,7 +49,32 @@ Rooleja on kaksi: **USER** käyttää tehtäviä, projekteja ja tunnisteita, ja 
 
 ## Tietokanta
 
-H2-konsoli on käytössä kehityksessä osoitteessa `/h2-console`. JDBC-osoite on `jdbc:h2:mem:tehtavat`, käyttäjä `sa` ja salasana tyhjä. Tiedot häviävät, kun sovellus sammutetaan. Konsoli vaatii nyt kirjautumisen, ja sen toimivuus selaimessa on vielä tarkistamatta.
+H2-konsoli on käytössä kehityksessä osoitteessa <http://localhost:8080/h2-console>. Konsoli vaatii kirjautumisen ylläpitäjänä (`ansu`). Kirjaudu ensin sovellukseen ja avaa sitten konsoli.
+
+| Asetus | Arvo |
+| --- | --- |
+| JDBC URL | `jdbc:h2:mem:tehtavat` |
+| User Name | `sa` |
+| Password | (tyhjä) |
+
+Tiedot häviävät, kun sovellus sammutetaan, ja testidata ladataan uudelleen joka käynnistyksessä.
+
+Taulut: `APP_USER`, `USER_PROFILE`, `PROJECT`, `TASK`, `TAG` ja liitostaulu `TASK_TAG`. Esimerkkikysely relaatioiden tarkasteluun:
+
+```sql
+-- 1:1 käyttäjä ja profiili
+SELECT u.USERNAME, p.FULL_NAME, p.JOB_TITLE
+FROM APP_USER u LEFT JOIN USER_PROFILE p ON u.PROFILE_ID = p.ID;
+
+-- 1:N projekti ja tehtävät
+SELECT p.NAME, t.TITLE FROM PROJECT p JOIN TASK t ON t.PROJECT_ID = p.ID;
+
+-- M:N tehtävä ja tunnisteet
+SELECT t.TITLE, g.NAME FROM TASK t
+JOIN TASK_TAG tt ON tt.TASK_ID = t.ID JOIN TAG g ON g.ID = tt.TAG_ID;
+```
+
+Huom: Bean Validation -säännöt (esimerkiksi värin muoto) toimivat vain sovelluksen kautta tallennettaessa, eivät suorassa SQL:ssä. Tietokanta valvoo vain `NOT NULL`- ja pituusrajoituksia.
 
 ## Testit
 
