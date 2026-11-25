@@ -124,6 +124,89 @@ class TaskSearchTest {
         assertTrue(ids(inProject(true, null, null, "raportti", null)).isEmpty());
     }
 
+    // --- Edistynyt haku (CriteriaQuery) ---
+
+    private List<Long> adv(String text, Long projectId, String projectName, Long tagId, String tagName,
+                           Boolean done, Integer minPriority, LocalDate from, LocalDate to) {
+        return service.advancedSearch(new TaskSearchCriteria(
+                        text, projectId, projectName, tagId, tagName, done, minPriority, from, to))
+                .stream().map(Task::getId).toList();
+    }
+
+    @Test
+    void advancedEmptyCriteriaReturnsEverything() {
+        assertTrue(service.advancedSearch(TaskSearchCriteria.none()).size() >= 3);
+        assertEquals(List.of(a.getId(), b.getId(), c.getId()),
+                adv(" ", project.getId(), null, null, "", null, null, null, null));
+    }
+
+    @Test
+    void advancedTextMatchesTitleOrDescription() {
+        assertEquals(List.of(a.getId()), adv("RAPORTTI", project.getId(), null, null, null, null, null, null, null));
+        assertEquals(List.of(c.getId()), adv("erikoismerk", project.getId(), null, null, null, null, null, null, null));
+        assertEquals(List.of(c.getId()), adv("100%", project.getId(), null, null, null, null, null, null, null));
+    }
+
+    @Test
+    void advancedFiltersByDateRange() {
+        assertEquals(List.of(b.getId()),
+                adv(null, project.getId(), null, null, null, null, null,
+                        LocalDate.of(2026, 3, 5), LocalDate.of(2026, 3, 15)));
+        assertTrue(adv(null, project.getId(), null, null, null, null, null,
+                LocalDate.of(2026, 4, 1), LocalDate.of(2026, 3, 1)).isEmpty());
+    }
+
+    @Test
+    void advancedFiltersByRelatedEntityViaJoin() {
+        assertEquals(List.of(a.getId()), adv(null, project.getId(), null, tag.getId(), null, null, null, null, null));
+        assertEquals(List.of(a.getId()), adv(null, project.getId(), null, null, "HAKUTAG", null, null, null, null));
+        assertTrue(adv(null, project.getId(), null, null, "olematon", null, null, null, null).isEmpty());
+    }
+
+    @Test
+    void advancedFiltersByRelatedEntityProperty() {
+        assertEquals(List.of(a.getId(), b.getId(), c.getId()),
+                adv(null, null, "hakutesti", null, null, null, null, null, null).stream()
+                        .filter(id -> List.of(a.getId(), b.getId(), c.getId()).contains(id)).toList());
+        assertTrue(adv(null, project.getId(), "ei-tällaista", null, null, null, null, null, null).isEmpty());
+    }
+
+    @Test
+    void advancedOrGroupCombinedWithAnd() {
+        // (otsikko OR kuvaus sisältää "raportti") AND valmis=false AND tagi
+        assertEquals(List.of(a.getId()),
+                adv("raportti", project.getId(), null, tag.getId(), null, false, null, null, null));
+        // sama sana, mutta valmiit: ei osumia
+        assertTrue(adv("raportti", project.getId(), null, null, null, true, null, null, null).isEmpty());
+    }
+
+    @Test
+    void advancedLoadsProjectAndAllTagsForDisplayOutsideTransaction() {
+        Tag second = tags.create("hakutagi2", "#dddddd");
+        service.addTag(a.getId(), second.getId());
+        em.flush();
+        em.clear();
+
+        // Haku yhdellä tunnisteella ei saa rajata tehtävän ladattuja tunnisteita
+        Task found = service.advancedSearch(new TaskSearchCriteria(
+                null, null, null, tag.getId(), null, null, null, null, null)).stream()
+                .filter(t -> t.getId().equals(a.getId())).findFirst().orElseThrow();
+
+        assertTrue(org.hibernate.Hibernate.isInitialized(found.getProject()));
+        assertTrue(org.hibernate.Hibernate.isInitialized(found.getTags()));
+        assertEquals(2, found.getTags().size());
+    }
+
+    @Test
+    void advancedDoesNotReturnDuplicatesWhenManyTagsMatch() {
+        Tag second = tags.create("hakutagi2", "#dddddd");
+        service.addTag(a.getId(), second.getId());
+        em.flush();
+
+        assertEquals(List.of(a.getId()),
+                adv(null, project.getId(), null, null, "hakutagi", null, null, null, null));
+    }
+
     @Test
     void findOverdueReturnsOnlyUnfinishedPastDue() {
         List<Long> overdue = service.findOverdue(LocalDate.of(2026, 3, 15)).stream()
