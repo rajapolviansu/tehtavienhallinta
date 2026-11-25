@@ -1,5 +1,7 @@
 package fi.app.tehtavienhallinta.ui;
 
+import fi.app.tehtavienhallinta.Role;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -43,7 +45,9 @@ public class MainLayout extends AppLayout {
 
     private Header createHeader(AuthenticationContext authContext) {
         String username = authContext.getPrincipalName().orElse("");
-        String role = authContext.hasRole("ADMIN") ? "Ylläpitäjä" : "Käyttäjä";
+        boolean loggedIn = authContext.isAuthenticated();
+        String role = authContext.hasRole("ADMIN") ? Role.ADMIN.getLabel()
+                : authContext.hasRole("SUPER") ? Role.SUPER.getLabel() : Role.USER.getLabel();
 
         // Teksti omassa span-elementissä, jotta se voidaan piilottaa kapealla näytöllä (vain ikoni jää)
         Span logoutLabel = new Span("Kirjaudu ulos");
@@ -85,7 +89,9 @@ public class MainLayout extends AppLayout {
         DrawerToggle toggle = new DrawerToggle();
         toggle.setAriaLabel("Avaa tai sulje valikko");
 
-        HorizontalLayout row = new HorizontalLayout(toggle, brand, userInfo);
+        // Kirjautumaton vierailija näkee kirjautumislinkin käyttäjätietojen sijaan
+        Component right = loggedIn ? userInfo : new RouterLink("Kirjaudu sisään", LoginView.class);
+        HorizontalLayout row = new HorizontalLayout(toggle, brand, right);
         row.setWidthFull();
         row.setAlignItems(FlexComponent.Alignment.CENTER);
         row.expand(brand);
@@ -99,6 +105,12 @@ public class MainLayout extends AppLayout {
 
     private SideNav createNavigation(AuthenticationContext authContext) {
         SideNav nav = new SideNav();
+        // Etusivu on kaikille avoin
+        nav.addItem(new SideNavItem("Etusivu", HomeView.class, VaadinIcon.HOME.create()));
+        if (!authContext.isAuthenticated()) {
+            return nav;
+        }
+        nav.addItem(new SideNavItem("Oma tili", AccountView.class, VaadinIcon.USER.create()));
         nav.addItem(new SideNavItem("Tehtävät", TasksView.class, VaadinIcon.TASKS.create()));
         nav.addItem(new SideNavItem("Kojelauta", DashboardView.class, VaadinIcon.DASHBOARD.create()));
         nav.addItem(new SideNavItem("Taulu", BoardView.class, VaadinIcon.GRID_BIG.create()));
@@ -106,7 +118,10 @@ public class MainLayout extends AppLayout {
         nav.addItem(new SideNavItem("Haku", SearchView.class, VaadinIcon.SEARCH.create()));
         nav.addItem(new SideNavItem("Projektit", ProjectsView.class, VaadinIcon.FOLDER.create()));
         nav.addItem(new SideNavItem("Tunnisteet", TagsView.class, VaadinIcon.TAGS.create()));
-        // Linkki näytetään vain ylläpitäjälle (näkymä on lisäksi suojattu @RolesAllowed:lla)
+        // Linkit näytetään vain oikeutetuille (näkymät on lisäksi suojattu @RolesAllowed:lla)
+        if (authContext.hasRole("SUPER") || authContext.hasRole("USER")) {
+            nav.addItem(new SideNavItem("Tiimi", TeamView.class, VaadinIcon.GROUP.create()));
+        }
         if (authContext.hasRole("ADMIN")) {
             nav.addItem(new SideNavItem("Käyttäjät", UsersView.class, VaadinIcon.USERS.create()));
         }

@@ -86,7 +86,7 @@ class LoginSecurityTest {
 
     @Test
     void anonymousIsRedirectedToLogin() throws Exception {
-        mvc.perform(get("/"))
+        mvc.perform(get("/tehtavat"))
                 .andExpect(status().is3xxRedirection());
     }
 }

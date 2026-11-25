@@ -57,7 +57,7 @@ class UserDialog extends Dialog {
         EmailField email = new EmailField("Sähköposti");
         ComboBox<Role> role = new ComboBox<>("Rooli");
         role.setItems(Role.values());
-        role.setItemLabelGenerator(r -> r == Role.ADMIN ? "Ylläpitäjä (ADMIN)" : "Käyttäjä (USER)");
+        role.setItemLabelGenerator(r -> r.getLabel() + " (" + r.name() + ")");
         role.setAllowCustomValue(false);
         if (editingSelf) {
             // Oman roolin vaihtaminen vahingossa voisi lukita ylläpitäjän ulos
