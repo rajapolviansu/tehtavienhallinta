@@ -25,6 +25,7 @@ public class MainView extends VerticalLayout {
 
     public MainView(AuthenticationContext authContext,
                     TasksPanel tasksPanel,
+                    SearchPanel searchPanel,
                     ProjectsPanel projectsPanel,
                     TagsPanel tagsPanel,
                     ObjectProvider<UsersPanel> usersPanel) {
@@ -40,6 +41,7 @@ public class MainView extends VerticalLayout {
         TabSheet tabs = new TabSheet();
         tabs.setSizeFull();
         Tab tasksTab = tabs.add("Tehtävät", tasksPanel);
+        Tab searchTab = tabs.add("Haku", searchPanel);
         tabs.add("Projektit", projectsPanel);
         tabs.add("Tunnisteet", tagsPanel);
         // Käyttäjäpaneeli luodaan vain ylläpitäjälle: palvelu hylkäisi muut
@@ -51,6 +53,8 @@ public class MainView extends VerticalLayout {
         tabs.addSelectedChangeListener(e -> {
             if (e.getSelectedTab() == tasksTab) {
                 tasksPanel.refresh();
+            } else if (e.getSelectedTab() == searchTab) {
+                searchPanel.reloadOptions();
             }
         });
 

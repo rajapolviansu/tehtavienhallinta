@@ -14,6 +14,12 @@ public final class TaskSpecifications {
     private TaskSpecifications() {
     }
 
+    /** Muodostaa pienillä kirjaimilla LIKE-kuvion ("%teksti%"); jokerimerkit % ja _ käsitellään kirjaimellisina (escape '\'). */
+    static String likePattern(String text) {
+        return "%" + text.trim().toLowerCase().replace("\\", "\\\\")
+                .replace("%", "\\%").replace("_", "\\_") + "%";
+    }
+
     public static Specification<Task> inProject(Long projectId) {
         return (root, query, cb) -> projectId == null
                 ? cb.conjunction()
@@ -53,8 +59,7 @@ public final class TaskSpecifications {
             if (text == null || text.isBlank()) {
                 return cb.conjunction();
             }
-            String pattern = "%" + text.trim().toLowerCase().replace("\\", "\\\\")
-                    .replace("%", "\\%").replace("_", "\\_") + "%";
+            String pattern = likePattern(text);
             return cb.or(
                     cb.like(cb.lower(root.get("title")), pattern, '\\'),
                     cb.like(cb.lower(cb.coalesce(root.<String>get("description"), "")), pattern, '\\'));

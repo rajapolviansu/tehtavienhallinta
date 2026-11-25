@@ -17,8 +17,12 @@ public class TaskService {
     private final ProjectService projects;
     private final TagService tags;
 
-    public TaskService(TaskRepository tasks, ProjectService projects, TagService tags) {
+    private final TaskSearchRepository searchRepository;
+
+    public TaskService(TaskRepository tasks, TaskSearchRepository searchRepository,
+                       ProjectService projects, TagService tags) {
         this.tasks = tasks;
+        this.searchRepository = searchRepository;
         this.projects = projects;
         this.tags = tags;
     }
@@ -49,6 +53,12 @@ public class TaskService {
     public List<Task> search(TaskFilter filter) {
         return tasks.findAll(filter.toSpecification(),
                 Sort.by(Sort.Order.asc("dueDate"), Sort.Order.asc("id")));
+    }
+
+    /** Edistynyt haku: dynaaminen CriteriaQuery useilla ehdoilla ja JOINeilla. */
+    @Transactional(readOnly = true)
+    public List<Task> advancedSearch(TaskSearchCriteria criteria) {
+        return searchRepository.search(criteria);
     }
 
     /** Palauttaa myöhässä olevat (erääntyneet ja keskeneräiset) tehtävät. */
