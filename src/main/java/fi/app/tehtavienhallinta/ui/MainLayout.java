@@ -2,15 +2,20 @@ package fi.app.tehtavienhallinta.ui;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.spring.security.AuthenticationContext;
@@ -31,29 +36,59 @@ public class MainLayout extends AppLayout {
     public MainLayout(AuthenticationContext authContext) {
         setPrimarySection(Section.DRAWER);
         addToNavbar(createHeader(authContext));
-        addToDrawer(createNavigation(authContext), createFooter());
+        addToDrawer(createNavigation(authContext));
+        // Footer lisätään layoutin juureen; tyylit kiinnittävät sen näkymän alareunaan
+        getElement().appendChild(createFooter().getElement());
     }
 
     private Header createHeader(AuthenticationContext authContext) {
         String username = authContext.getPrincipalName().orElse("");
-        Button logout = new Button("Kirjaudu ulos", e -> authContext.logout());
+        String role = authContext.hasRole("ADMIN") ? "Ylläpitäjä" : "Käyttäjä";
+
+        // Teksti omassa span-elementissä, jotta se voidaan piilottaa kapealla näytöllä (vain ikoni jää)
+        Span logoutLabel = new Span("Kirjaudu ulos");
+        logoutLabel.addClassName("header-logout-label");
+        Button logout = new Button(VaadinIcon.SIGN_OUT.create(), e -> authContext.logout());
+        logout.getElement().appendChild(logoutLabel.getElement());
         logout.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
         logout.addClassName("fade-in-button");
+        logout.setAriaLabel("Kirjaudu ulos");
 
-        HorizontalLayout userInfo = new HorizontalLayout(new Span("Kirjautunut: " + username), logout);
+        Avatar avatar = new Avatar(username);
+        avatar.setTooltipEnabled(false);
+        Span name = new Span(username);
+        name.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.SMALL);
+        Span roleLabel = new Span(role);
+        roleLabel.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.XSMALL);
+        Div userText = new Div(name, roleLabel);
+        userText.addClassName("header-user-text");
+        userText.getStyle().set("display", "flex");
+        userText.getStyle().set("flex-direction", "column");
+        userText.getStyle().set("line-height", "1.2");
+
+        HorizontalLayout userInfo = new HorizontalLayout(avatar, userText, logout);
         userInfo.setAlignItems(FlexComponent.Alignment.CENTER);
-        userInfo.addClassName("zoom-card");
-        userInfo.getStyle().set("padding", "var(--lumo-space-s) var(--lumo-space-m)");
+        userInfo.addClassNames("zoom-card", "header-user-info");
+        userInfo.getStyle().set("padding", "var(--lumo-space-xs) var(--lumo-space-m)");
         userInfo.getStyle().set("background", "var(--app-green-100)");
         userInfo.getStyle().set("border-radius", "var(--lumo-border-radius-l)");
 
+        Icon logo = VaadinIcon.CHECK_CIRCLE.create();
+        logo.setColor("var(--app-gold)");
         H1 title = new H1("Tehtävienhallinta");
         title.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
+        HorizontalLayout brand = new HorizontalLayout(logo, title);
+        brand.setAlignItems(FlexComponent.Alignment.CENTER);
+        brand.setSpacing(false);
+        brand.addClassNames(LumoUtility.Gap.SMALL, "header-brand");
 
-        HorizontalLayout row = new HorizontalLayout(new DrawerToggle(), title, userInfo);
+        DrawerToggle toggle = new DrawerToggle();
+        toggle.setAriaLabel("Avaa tai sulje valikko");
+
+        HorizontalLayout row = new HorizontalLayout(toggle, brand, userInfo);
         row.setWidthFull();
         row.setAlignItems(FlexComponent.Alignment.CENTER);
-        row.expand(title);
+        row.expand(brand);
         row.addClassName(LumoUtility.Padding.Horizontal.MEDIUM);
 
         Header header = new Header(row);
@@ -78,12 +113,34 @@ public class MainLayout extends AppLayout {
         return nav;
     }
 
+    /**
+     * Footer on kiinnitetty näkymän alareunaan (CSS: position fixed) ja erottuu tummalla
+     * taustalla. Kapealla näytöllä sisältö rivittyy keskitetysti.
+     */
     private Footer createFooter() {
-        Footer footer = new Footer(new Span("© " + Year.now() + " Tehtävienhallinta"));
-        footer.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.SMALL,
-                LumoUtility.Padding.MEDIUM);
-        // Työntää footerin sivuvalikon alareunaan
-        footer.getStyle().set("margin-top", "auto");
+        Span copyright = new Span("© " + Year.now() + " Ansu Rajapolvi · Tehtävienhallinta");
+        copyright.addClassName("app-footer-text");
+
+        Anchor source = footerLink("Lähdekoodi (GitHub)", "https://github.com/rajapolviansu/tehtavienhallinta",
+                VaadinIcon.CODE.create());
+        Anchor vaadin = footerLink("Vaadin", "https://vaadin.com", VaadinIcon.EXTERNAL_LINK.create());
+        RouterLink search = new RouterLink("Haku", SearchView.class);
+        search.addClassName("app-footer-link");
+
+        Div links = new Div(source, vaadin, search);
+        links.addClassName("app-footer-links");
+
+        Footer footer = new Footer(copyright, links);
+        footer.addClassName("app-footer");
         return footer;
+    }
+
+    private Anchor footerLink(String text, String href, Icon icon) {
+        icon.setSize("var(--lumo-font-size-s)");
+        Anchor a = new Anchor(href, icon, new Span(text));
+        a.setTarget("_blank");
+        a.getElement().setAttribute("rel", "noopener noreferrer");
+        a.addClassName("app-footer-link");
+        return a;
     }
 }
