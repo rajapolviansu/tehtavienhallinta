@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * Tehtävälista: haku, lisäys, muokkaus ja poisto (poisto vahvistetaan).
  */
-@Route(value = "", layout = MainLayout.class)
+@Route(value = "tehtavat", layout = MainLayout.class)
 @PageTitle("Tehtävät | Tehtävienhallinta")
 @PermitAll
 public class TasksView extends VerticalLayout {
