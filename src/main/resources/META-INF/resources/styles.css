@@ -1,0 +1,116 @@
+/* ==========================================================================
+   1. GLOBAALIT TYYLIT (koko sovellus)
+   ========================================================================== */
+
+/* Oma fontti (Google Fonts). Jos verkko ei ole käytettävissä, käytetään varafontteja. */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+html {
+  /* Oletusfontti ja perusfonttikoko koko sovellukselle */
+  --lumo-font-family: 'Nunito', 'Segoe UI', Roboto, Arial, sans-serif;
+  --lumo-font-size-m: 1rem;
+  --lumo-font-size-s: 0.9375rem;
+
+  /* Oma väripaletti: metsänvihreä pääväri + lämmin kulta korostus */
+  --app-green-900: #12372a;
+  --app-green-700: #1f6f54;
+  --app-green-500: #2e9e75;
+  --app-green-100: #e3f4ec;
+  --app-gold: #e8a33d;
+  --app-cream: #fbf8f1;
+
+  --lumo-primary-color: var(--app-green-700);
+  --lumo-primary-color-50pct: rgb(31 111 84 / 0.5);
+  --lumo-primary-color-10pct: rgb(31 111 84 / 0.1);
+  --lumo-primary-text-color: var(--app-green-700);
+  --lumo-base-color: var(--app-cream);
+  --lumo-header-text-color: var(--app-green-900);
+  --lumo-body-text-color: #2b3a34;
+  --lumo-secondary-text-color: #5f6f68;
+  --lumo-contrast-5pct: rgb(18 55 42 / 0.05);
+  --lumo-contrast-10pct: rgb(18 55 42 / 0.1);
+
+  /* Komponenttien kaarevuus: pehmeämmät, pyöreämmät kulmat */
+  --lumo-border-radius-s: 0.5em;
+  --lumo-border-radius-m: 0.9em;
+  --lumo-border-radius-l: 1.4em;
+}
+
+body {
+  background: var(--app-cream);
+}
+
+h1, h2, h3 {
+  color: var(--app-green-900);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* Nappien syvyys: varjo ja pieni nosto hoverissa (kaikki vaadin-button -elementit) */
+vaadin-button {
+  font-weight: 700;
+  box-shadow: 0 2px 0 rgb(18 55 42 / 0.18), 0 4px 8px rgb(18 55 42 / 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+vaadin-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 rgb(18 55 42 / 0.2), 0 8px 14px rgb(18 55 42 / 0.16);
+}
+
+vaadin-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 0 rgb(18 55 42 / 0.2);
+}
+
+/* Tekstikenttien ulkoasu: paksumpi reunus ja vihreä fokusrengas */
+vaadin-text-field,
+vaadin-integer-field,
+vaadin-combo-box,
+vaadin-date-picker,
+vaadin-password-field {
+  --vaadin-input-field-border-width: 2px;
+  --vaadin-input-field-border-color: var(--app-green-100);
+  --vaadin-input-field-background: #ffffff;
+  --vaadin-input-field-focus-ring-color: var(--app-gold);
+}
+
+/* ==========================================================================
+   5. HOVER-, FOCUS- JA TRANSITION-TILAT (uudelleenkäytettävät CSS-luokat)
+   ========================================================================== */
+
+/* Kortti, joka zoomaa 3 % hoverissa ja saa focus-tilassa kultaisen reunuksen */
+.zoom-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: default;
+}
+
+.zoom-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 24px rgb(18 55 42 / 0.2);
+}
+
+.zoom-card:focus-within {
+  outline: 3px solid var(--app-gold);
+  outline-offset: 2px;
+}
+
+/* Napit, joilla on fade-in-animaatio sisääntulossa sekä hover- ja focus-tila */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-button {
+  animation: fade-in 0.6s ease-out both;
+}
+
+.fade-in-button:hover {
+  background-color: var(--app-green-500);
+  color: #fff;
+}
+
+.fade-in-button:focus-visible {
+  outline: 3px solid var(--app-gold);
+  outline-offset: 2px;
+}
