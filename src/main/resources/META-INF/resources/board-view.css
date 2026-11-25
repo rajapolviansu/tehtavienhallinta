@@ -1,7 +1,11 @@
 .board-view .board-columns {
   gap: var(--lumo-space-m);
   align-items: flex-start;
-  overflow-x: auto;
+  /* Ei omaa skrollauspalkkia: sarakkeet rivittyvät ja sivu skrollaa */
+  flex-wrap: wrap;
+  overflow: visible;
+  height: auto;
+  flex-grow: 0;
 }
 
 .board-view .board-column {
@@ -53,3 +57,9 @@
 .board-view .card-project { color: var(--app-green-700); font-size: var(--lumo-font-size-s); }
 .board-view .card-due { color: var(--lumo-secondary-text-color); font-size: var(--lumo-font-size-s); }
 .board-view .col-done .card-title { text-decoration: line-through; opacity: 0.7; }
+
+/* Näkymä kasvaa sisällön mukaan, jolloin alatila ja footer eivät peitä sisältöä */
+.board-view {
+  height: auto !important;
+  min-height: 100%;
+}
