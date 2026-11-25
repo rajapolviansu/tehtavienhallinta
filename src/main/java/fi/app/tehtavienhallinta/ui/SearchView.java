@@ -15,8 +15,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.PermitAll;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import fi.app.tehtavienhallinta.Project;
 import fi.app.tehtavienhallinta.ProjectService;
@@ -34,10 +35,11 @@ import java.util.stream.Collectors;
  * Edistynyt hakunäkymä: useita ehtoja yhdistetään (AND), tekstihaku on otsikko OR kuvaus ja
  * hakua voi rajata projektin ja tunnisteen nimellä (JOIN). Tyhjiä kenttiä ei oteta huomioon.
  */
-@SpringComponent
-@UIScope
+@Route(value = "haku", layout = MainLayout.class)
+@PageTitle("Haku | Tehtävienhallinta")
+@PermitAll
 @StyleSheet("search-view.css")
-public class SearchPanel extends VerticalLayout {
+public class SearchView extends VerticalLayout {
 
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("d.M.yyyy");
 
@@ -58,7 +60,7 @@ public class SearchPanel extends VerticalLayout {
     private final Grid<Task> grid = new Grid<>(Task.class, false);
     private final Span resultCount = new Span();
 
-    public SearchPanel(TaskService tasks, ProjectService projects, TagService tags) {
+    public SearchView(TaskService tasks, ProjectService projects, TagService tags) {
         this.tasks = tasks;
         this.projects = projects;
         this.tags = tags;

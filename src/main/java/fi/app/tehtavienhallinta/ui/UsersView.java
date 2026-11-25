@@ -7,8 +7,9 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.RolesAllowed;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import fi.app.tehtavienhallinta.AppUser;
 import fi.app.tehtavienhallinta.AppUserService;
@@ -18,12 +19,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 
 /**
- * Käyttäjien hallinta. Vain ADMIN: palvelu hylkää muut, ja {@link MainView} luo tämän paneelin
- * vain ylläpitäjälle (muuten jo pelkkä luominen kaatuisi tavalliselta käyttäjältä).
+ * Käyttäjien hallinta. Vain ADMIN: palvelu hylkää muut, ja pääsy näkymään on rajattu ylläpitäjälle
+ * (@RolesAllowed) eikä valikko näytä linkkiä muille.
  */
-@SpringComponent
-@UIScope
-public class UsersPanel extends VerticalLayout {
+@Route(value = "kayttajat", layout = MainLayout.class)
+@PageTitle("Käyttäjät | Tehtävienhallinta")
+@RolesAllowed("ADMIN")
+public class UsersView extends VerticalLayout {
 
     private static final DateTimeFormatter DATE =
             DateTimeFormatter.ofPattern("d.M.yyyy").withZone(ZoneId.systemDefault());
@@ -32,7 +34,7 @@ public class UsersPanel extends VerticalLayout {
     private final String currentUsername;
     private final Grid<AppUser> grid = new Grid<>(AppUser.class, false);
 
-    public UsersPanel(AppUserService users, AuthenticationContext authContext) {
+    public UsersView(AppUserService users, AuthenticationContext authContext) {
         this.users = users;
         this.currentUsername = authContext.getPrincipalName().orElse("");
 
