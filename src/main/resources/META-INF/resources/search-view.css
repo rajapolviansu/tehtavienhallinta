@@ -24,3 +24,9 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+
+/* Tulostaulukko saa aina riittävän korkeuden (puhelimella lomake vie muuten kaiken tilan) */
+.search-view vaadin-grid {
+  min-height: 22rem;
+  flex-shrink: 0;
+}

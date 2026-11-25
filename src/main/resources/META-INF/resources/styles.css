@@ -114,3 +114,111 @@ vaadin-password-field {
   outline: 3px solid var(--app-gold);
   outline-offset: 2px;
 }
+
+/* Header: kapealla näytöllä käyttäjärivi tiivistyy (avatar + logout-ikoni) */
+.header-brand {
+  min-width: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .header-user-text,
+  .header-logout-label {
+    display: none !important;
+  }
+
+  .header-user-info {
+    padding: var(--lumo-space-xs) var(--lumo-space-s) !important;
+  }
+
+  .header-brand h1 {
+    font-size: var(--lumo-font-size-m);
+    white-space: nowrap;
+  }
+}
+
+/* ==========================================================================
+   NAVIGAATIO: aktiivisen sivun korostus (SideNav asettaa [current]-attribuutin)
+   ========================================================================== */
+vaadin-side-nav-item::part(content) {
+  border-radius: var(--lumo-border-radius-m);
+  transition: background-color 0.15s ease;
+}
+
+vaadin-side-nav-item[current]::part(content) {
+  background: var(--app-green-100);
+  color: var(--app-green-900);
+  font-weight: 800;
+  box-shadow: inset 4px 0 0 var(--app-gold);
+}
+
+/* ==========================================================================
+   FOOTER: kiinnitetty alareunaan, tumma tausta, kultainen yläreuna
+   ========================================================================== */
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  /* Pysyvän sivuvalikon leveys; ylikatettavan valikon kanssa 0 */
+  left: var(--vaadin-app-layout-drawer-offset-size, 0);
+  z-index: 3;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lumo-space-xs) var(--lumo-space-l);
+  padding: var(--lumo-space-s) var(--lumo-space-l);
+  background: var(--app-green-900);
+  color: #e3f4ec;
+  border-top: 3px solid var(--app-gold);
+  font-size: var(--lumo-font-size-s);
+}
+
+.app-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lumo-space-xs) var(--lumo-space-m);
+}
+
+.app-footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.app-footer-link:hover {
+  color: var(--app-gold);
+  text-decoration: underline;
+}
+
+.app-footer-link:focus-visible {
+  outline: 3px solid var(--app-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Sisältöalueen alareunaan tilaa, ettei kiinteä footer peitä sisältöä */
+vaadin-app-layout > :not([slot]):not(.app-footer) {
+  padding-bottom: 5rem;
+}
+
+@media (max-width: 600px) {
+  .app-footer {
+    justify-content: center;
+    text-align: center;
+    font-size: var(--lumo-font-size-xs);
+    padding: var(--lumo-space-xs) var(--lumo-space-m);
+  }
+
+  .app-footer-links {
+    justify-content: center;
+  }
+
+  vaadin-app-layout > :not([slot]):not(.app-footer) {
+    padding-bottom: 7rem;
+  }
+}
