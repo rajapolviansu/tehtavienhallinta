@@ -1,5 +1,6 @@
 package fi.app.tehtavienhallinta.ui;
 
+import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -16,6 +17,7 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import fi.app.tehtavienhallinta.Project;
 import fi.app.tehtavienhallinta.ProjectService;
 import fi.app.tehtavienhallinta.Tag;
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
  */
 @SpringComponent
 @UIScope
+@StyleSheet("search-view.css")
 public class SearchPanel extends VerticalLayout {
 
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("d.M.yyyy");
@@ -62,6 +65,8 @@ public class SearchPanel extends VerticalLayout {
 
         setSizeFull();
         setPadding(false);
+        // 3. Näkymäkohtainen CSS: search-view.css vaikuttaa vain tähän luokkaan
+        addClassName("search-view");
 
         project.setItemLabelGenerator(Project::getName);
         project.setClearButtonVisible(true);
@@ -83,13 +88,21 @@ public class SearchPanel extends VerticalLayout {
         form.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
                 new FormLayout.ResponsiveStep("40em", 3));
+        // 4. Lumo Utility -luokat: Background, Padding, BoxShadow, BorderRadius, Margin
+        form.addClassNames(LumoUtility.Background.BASE, LumoUtility.Padding.LARGE,
+                LumoUtility.BoxShadow.MEDIUM, LumoUtility.BorderRadius.LARGE,
+                LumoUtility.Margin.Bottom.SMALL);
 
         Button searchButton = new Button("Hae", VaadinIcon.SEARCH.create(), e -> search());
         searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        searchButton.addClassName("fade-in-button");
         searchButton.addClickShortcut(com.vaadin.flow.component.Key.ENTER);
         Button clear = new Button("Tyhjennä", e -> clear());
         HorizontalLayout actions = new HorizontalLayout(searchButton, clear, resultCount);
         actions.setAlignItems(Alignment.CENTER);
+        // 4. TextColor + FontSize + Padding
+        resultCount.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.LARGE,
+                LumoUtility.Padding.Horizontal.MEDIUM);
 
         configureGrid();
         add(form, actions, grid);

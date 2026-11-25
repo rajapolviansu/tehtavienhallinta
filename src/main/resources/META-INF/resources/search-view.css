@@ -1,0 +1,26 @@
+/* ==========================================================================
+   3. NÄKYMÄKOHTAINEN CSS
+   Kaikki säännöt alkavat luokalla .search-view, joten ne vaikuttavat vain
+   hakunäkymään (SearchPanel) – mutta usean eri Vaadin-komponentin ulkoasuun.
+   ========================================================================== */
+
+.search-view vaadin-text-field,
+.search-view vaadin-integer-field,
+.search-view vaadin-combo-box,
+.search-view vaadin-date-picker {
+  --vaadin-input-field-background: var(--app-green-100);
+  --vaadin-input-field-border-color: var(--app-green-500);
+  --vaadin-input-field-label-color: var(--app-green-900);
+}
+
+.search-view vaadin-grid {
+  border: 2px solid var(--app-green-100);
+  border-radius: var(--lumo-border-radius-l);
+  overflow: hidden;
+  --vaadin-grid-cell-background: #ffffff;
+}
+
+.search-view vaadin-button {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
