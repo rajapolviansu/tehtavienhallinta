@@ -43,6 +43,7 @@ public class ProjectService {
         project.setDescription(changes.getDescription());
         project.setStartDate(changes.getStartDate());
         project.setDueDate(changes.getDueDate());
+        project.setBudget(changes.getBudget());
         project.setArchived(changes.isArchived());
         return projects.save(project);
     }

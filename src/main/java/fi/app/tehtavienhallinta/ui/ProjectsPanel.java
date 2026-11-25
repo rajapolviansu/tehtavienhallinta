@@ -58,6 +58,8 @@ public class ProjectsPanel extends VerticalLayout {
                 .setHeader("Eräpäivä").setAutoWidth(true).setFlexGrow(0)
                 .setComparator(Comparator.comparing(Project::getDueDate,
                         Comparator.nullsLast(Comparator.naturalOrder())));
+        grid.addColumn(p -> p.getBudget() == null ? "" : p.getBudget().toPlainString() + " €")
+                .setHeader("Budjetti").setAutoWidth(true).setFlexGrow(0);
         grid.addColumn(new ComponentRenderer<>(p -> {
             Checkbox box = new Checkbox(p.isArchived());
             box.setReadOnly(true);

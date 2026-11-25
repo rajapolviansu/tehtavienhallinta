@@ -6,6 +6,7 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -39,12 +40,20 @@ class ProjectDialog extends Dialog {
         description.setMaxLength(2000);
         DatePicker start = new FinnishDatePicker("Alkupäivä");
         DatePicker due = new FinnishDatePicker("Eräpäivä");
+        BigDecimalField budget = new BigDecimalField("Budjetti (€)");
+        budget.setHelperText("Valinnainen, ei negatiivinen");
         Checkbox archived = new Checkbox("Arkistoitu");
 
-        binder.forField(name).asRequired("Nimi on pakollinen").bind("name");
+        binder.forField(name).asRequired("Nimi on pakollinen")
+                .withValidator(n -> n.trim().length() >= 3, "Nimen tulee olla vähintään 3 merkkiä")
+                .bind("name");
         binder.forField(description).bind("description");
-        binder.forField(start).bind("startDate");
-        binder.forField(due).bind("dueDate");
+        binder.forField(start).asRequired("Alkupäivä on pakollinen").bind("startDate");
+        binder.forField(due).asRequired("Eräpäivä on pakollinen").bind("dueDate");
+        binder.forField(budget)
+                .withValidator(b -> b == null || b.signum() >= 0, "Budjetti ei voi olla negatiivinen")
+                .withValidator(b -> b == null || b.scale() <= 2, "Enintään kaksi desimaalia")
+                .bind("budget");
         binder.forField(archived).bind("archived");
         binder.withValidator(p -> p.getStartDate() == null || p.getDueDate() == null
                         || !p.getDueDate().isBefore(p.getStartDate()),
@@ -55,11 +64,12 @@ class ProjectDialog extends Dialog {
             working.setDescription(existing.getDescription());
             working.setStartDate(existing.getStartDate());
             working.setDueDate(existing.getDueDate());
+            working.setBudget(existing.getBudget());
             working.setArchived(existing.isArchived());
         }
         binder.readBean(working);
 
-        FormLayout form = new FormLayout(name, description, start, due, archived);
+        FormLayout form = new FormLayout(name, description, start, due, budget, archived);
         form.setColspan(name, 2);
         form.setColspan(description, 2);
         add(form);
