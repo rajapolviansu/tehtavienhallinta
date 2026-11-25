@@ -8,6 +8,7 @@ import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -49,6 +50,14 @@ class TaskDialog extends Dialog {
         TextArea description = new TextArea("Kuvaus");
         description.setMaxLength(2000);
         DatePicker dueDate = new FinnishDatePicker("Eräpäivä");
+        IntegerField priority = new IntegerField("Tärkeys (1-5)");
+        priority.setMin(1);
+        priority.setMax(5);
+        priority.setStepButtonsVisible(true);
+        IntegerField estimate = new IntegerField("Arvioitu työmäärä (h)");
+        estimate.setMin(0);
+        estimate.setMax(1000);
+        estimate.setStepButtonsVisible(true);
         Checkbox done = new Checkbox("Valmis");
 
         ComboBox<Project> project = new ComboBox<>("Projekti");
@@ -59,9 +68,17 @@ class TaskDialog extends Dialog {
         tagField.setItems(tags.findAll());
         tagField.setItemLabelGenerator(Tag::getName);
 
-        binder.forField(title).asRequired("Otsikko on pakollinen").bind("title");
+        binder.forField(title).asRequired("Otsikko on pakollinen")
+                .withValidator(t -> t.trim().length() >= 3, "Otsikon tulee olla vähintään 3 merkkiä")
+                .bind("title");
         binder.forField(description).bind("description");
-        binder.forField(dueDate).bind("dueDate");
+        binder.forField(dueDate).asRequired("Eräpäivä on pakollinen").bind("dueDate");
+        binder.forField(priority).asRequired("Tärkeys on pakollinen")
+                .withValidator(v -> v >= 1 && v <= 5, "Tärkeyden tulee olla 1-5")
+                .bind(Task::getPriority, (t, v) -> t.setPriority(v));
+        binder.forField(estimate)
+                .withValidator(v -> v == null || (v >= 0 && v <= 1000), "Arvion tulee olla 0-1000 tuntia")
+                .bind(Task::getEstimatedHours, Task::setEstimatedHours);
         binder.forField(done).bind("done");
         binder.forField(project).asRequired("Valitse projekti").bind(Task::getProject, Task::setProject);
         binder.forField(tagField).bind(Task::getTags, (t, selected) -> {
@@ -73,13 +90,15 @@ class TaskDialog extends Dialog {
             working.setTitle(existing.getTitle());
             working.setDescription(existing.getDescription());
             working.setDueDate(existing.getDueDate());
+            working.setPriority(existing.getPriority());
+            working.setEstimatedHours(existing.getEstimatedHours());
             working.setDone(existing.isDone());
             working.setProject(existing.getProject());
             working.getTags().addAll(existing.getTags());
         }
         binder.readBean(working);
 
-        FormLayout form = new FormLayout(title, description, dueDate, done, project, tagField);
+        FormLayout form = new FormLayout(title, description, dueDate, priority, estimate, done, project, tagField);
         form.setColspan(title, 2);
         form.setColspan(description, 2);
         form.setColspan(tagField, 2);
@@ -119,6 +138,8 @@ class TaskDialog extends Dialog {
         copy.setTitle(source.getTitle());
         copy.setDescription(source.getDescription());
         copy.setDueDate(source.getDueDate());
+        copy.setPriority(source.getPriority());
+        copy.setEstimatedHours(source.getEstimatedHours());
         copy.setDone(source.isDone());
         return copy;
     }

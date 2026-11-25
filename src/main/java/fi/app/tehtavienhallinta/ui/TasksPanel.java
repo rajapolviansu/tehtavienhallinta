@@ -93,6 +93,7 @@ public class TasksPanel extends VerticalLayout {
         grid.addColumn(t -> t.getTags().stream().map(Tag::getName).sorted()
                         .collect(Collectors.joining(", ")))
                 .setHeader("Tunnisteet").setFlexGrow(1);
+        grid.addColumn(t -> t.getPriority()).setHeader("Tärkeys").setAutoWidth(true).setFlexGrow(0);
         grid.addColumn(t -> t.getDueDate() == null ? "" : DATE.format(t.getDueDate()))
                 .setHeader("Eräpäivä").setAutoWidth(true).setFlexGrow(0)
                 .setComparator(Comparator.comparing(Task::getDueDate,

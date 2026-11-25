@@ -10,9 +10,13 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,7 +31,7 @@ public class Project {
     private Long id;
 
     @NotBlank
-    @Size(max = 200)
+    @Size(min = 3, max = 200)
     @Column(nullable = false, length = 200)
     private String name;
 
@@ -35,9 +39,16 @@ public class Project {
     @Column(length = 2000)
     private String description;
 
+    @NotNull
     private LocalDate startDate;
 
+    @NotNull
     private LocalDate dueDate;
+
+    @PositiveOrZero
+    @Digits(integer = 10, fraction = 2)
+    @Column(precision = 12, scale = 2)
+    private BigDecimal budget;
 
     @Column(nullable = false)
     private boolean archived = false;
@@ -96,6 +107,14 @@ public class Project {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public BigDecimal getBudget() {
+        return budget;
+    }
+
+    public void setBudget(BigDecimal budget) {
+        this.budget = budget;
     }
 
     public boolean isArchived() {

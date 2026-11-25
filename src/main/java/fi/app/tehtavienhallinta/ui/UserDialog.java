@@ -7,6 +7,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.EmailValidator;
@@ -14,6 +15,9 @@ import com.vaadin.flow.data.validator.StringLengthValidator;
 import fi.app.tehtavienhallinta.AppUser;
 import fi.app.tehtavienhallinta.AppUserService;
 import fi.app.tehtavienhallinta.Role;
+import fi.app.tehtavienhallinta.UserProfile;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.data.validator.RegexpValidator;
 
 /**
  * Lomake käyttäjän lisäämiseen ja muokkaamiseen. Salasana asetetaan vain uutta käyttäjää luotaessa.
@@ -26,6 +30,11 @@ class UserDialog extends Dialog {
         String email;
         String password;
         Role role = Role.USER;
+        String fullName;
+        String phone;
+        String jobTitle;
+        String bio;
+        String website;
     }
 
     private final AppUserService users;
@@ -41,7 +50,7 @@ class UserDialog extends Dialog {
         this.onSaved = onSaved;
 
         setHeaderTitle(existing == null ? "Uusi käyttäjä" : "Muokkaa käyttäjää");
-        setWidth("28em");
+        setWidth("32em");
 
         TextField username = new TextField("Käyttäjätunnus");
         username.setMaxLength(50);
@@ -58,7 +67,9 @@ class UserDialog extends Dialog {
 
         binder.forField(username)
                 .asRequired("Käyttäjätunnus on pakollinen")
-                .withValidator(new StringLengthValidator("Enintään 50 merkkiä", 0, 50))
+                .withValidator(new StringLengthValidator("Käyttäjätunnuksen tulee olla 3-50 merkkiä", 3, 50))
+                .withValidator(new RegexpValidator("Vain kirjaimia, numeroita sekä merkkejä . _ -",
+                        "^[a-zA-Z0-9._-]+$"))
                 .bind(f -> f.username, (f, v) -> f.username = v);
         binder.forField(email)
                 .asRequired("Sähköposti on pakollinen")
@@ -67,6 +78,38 @@ class UserDialog extends Dialog {
         binder.forField(role)
                 .asRequired("Valitse rooli")
                 .bind(f -> f.role, (f, v) -> f.role = v);
+
+        TextField fullName = new TextField("Koko nimi");
+        fullName.setMaxLength(100);
+        TextField phone = new TextField("Puhelin");
+        phone.setPlaceholder("+358 40 123 4567");
+        phone.setMaxLength(20);
+        TextField jobTitle = new TextField("Tehtävänimike");
+        jobTitle.setMaxLength(100);
+        TextField website = new TextField("Verkkosivu");
+        website.setPlaceholder("https://");
+        website.setMaxLength(200);
+        TextArea bio = new TextArea("Esittely");
+        bio.setMaxLength(500);
+
+        binder.forField(fullName)
+                .asRequired("Koko nimi on pakollinen")
+                .withValidator(new StringLengthValidator("Nimen tulee olla 2-100 merkkiä", 2, 100))
+                .bind(f -> f.fullName, (f, v) -> f.fullName = v);
+        binder.forField(phone)
+                .withValidator(v -> v == null || v.isBlank() || v.matches(UserProfile.PHONE_PATTERN),
+                        "Anna kelvollinen puhelinnumero")
+                .bind(f -> f.phone, (f, v) -> f.phone = v);
+        binder.forField(jobTitle)
+                .withValidator(new StringLengthValidator("Enintään 100 merkkiä", 0, 100))
+                .bind(f -> f.jobTitle, (f, v) -> f.jobTitle = v);
+        binder.forField(website)
+                .withValidator(v -> v == null || v.isBlank() || v.matches(UserProfile.WEBSITE_PATTERN),
+                        "Osoitteen tulee alkaa http:// tai https://")
+                .bind(f -> f.website, (f, v) -> f.website = v);
+        binder.forField(bio)
+                .withValidator(new StringLengthValidator("Enintään 500 merkkiä", 0, 500))
+                .bind(f -> f.bio, (f, v) -> f.bio = v);
 
         FormLayout layout = new FormLayout(username, email, role);
         layout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
@@ -86,6 +129,15 @@ class UserDialog extends Dialog {
             form.email = existing.getEmail();
             form.role = existing.getRole();
         }
+        layout.add(new H4("Profiili"), fullName, phone, jobTitle, website, bio);
+        UserProfile profile = existing == null ? null : existing.getProfile();
+        if (profile != null) {
+            form.fullName = profile.getFullName();
+            form.phone = profile.getPhone();
+            form.jobTitle = profile.getJobTitle();
+            form.bio = profile.getBio();
+            form.website = profile.getWebsite();
+        }
         binder.readBean(form);
         add(layout);
 
@@ -94,15 +146,29 @@ class UserDialog extends Dialog {
         getFooter().add(new Button("Peruuta", e -> close()), save);
     }
 
+    private UserProfile profileFromForm() {
+        UserProfile profile = new UserProfile();
+        profile.setFullName(form.fullName);
+        profile.setPhone(blankToNull(form.phone));
+        profile.setJobTitle(blankToNull(form.jobTitle));
+        profile.setBio(blankToNull(form.bio));
+        profile.setWebsite(blankToNull(form.website));
+        return profile;
+    }
+
+    private static String blankToNull(String s) {
+        return s == null || s.isBlank() ? null : s.trim();
+    }
+
     private void save() {
         if (!binder.writeBeanIfValid(form)) {
             return;
         }
         try {
             if (existing == null) {
-                users.create(form.username, form.email, form.password, form.role);
+                users.create(form.username, form.email, form.password, form.role, profileFromForm());
             } else {
-                users.update(existing.getId(), form.username, form.email, form.role);
+                users.update(existing.getId(), form.username, form.email, form.role, profileFromForm());
             }
         } catch (RuntimeException ex) {
             Ui.error("Tallennus epäonnistui: " + ex.getMessage());

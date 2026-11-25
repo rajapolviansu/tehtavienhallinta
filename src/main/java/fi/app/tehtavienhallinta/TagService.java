@@ -17,13 +17,28 @@ public class TagService {
         this.tags = tags;
     }
 
+    /** Apumetodi: luo tagin pelkällä nimellä ja värillä. */
     public Tag create(String name, String color) {
-        if (tags.existsByNameIgnoreCase(name)) {
-            throw new IllegalArgumentException("Tagi on jo olemassa: " + name);
+        Tag data = new Tag();
+        data.setName(name);
+        data.setColor(color);
+        return create(data);
+    }
+
+    public Tag update(Long id, String name, String color) {
+        Tag data = new Tag();
+        data.setName(name);
+        data.setColor(color);
+        data.setSortOrder(get(id).getSortOrder());
+        return update(id, data);
+    }
+
+    public Tag create(Tag data) {
+        if (tags.existsByNameIgnoreCase(data.getName())) {
+            throw new IllegalArgumentException("Tagi on jo olemassa: " + data.getName());
         }
         Tag tag = new Tag();
-        tag.setName(name);
-        tag.setColor(color);
+        copyFields(data, tag);
         return tags.save(tag);
     }
 
@@ -38,14 +53,21 @@ public class TagService {
                 .orElseThrow(() -> new EntityNotFoundException("Tagia ei löytynyt: " + id));
     }
 
-    public Tag update(Long id, String name, String color) {
+    public Tag update(Long id, Tag data) {
         Tag tag = get(id);
-        if (!name.equalsIgnoreCase(tag.getName()) && tags.existsByNameIgnoreCase(name)) {
-            throw new IllegalArgumentException("Tagi on jo olemassa: " + name);
+        if (!data.getName().equalsIgnoreCase(tag.getName()) && tags.existsByNameIgnoreCase(data.getName())) {
+            throw new IllegalArgumentException("Tagi on jo olemassa: " + data.getName());
         }
-        tag.setName(name);
-        tag.setColor(color);
+        copyFields(data, tag);
         return tags.save(tag);
+    }
+
+    private static void copyFields(Tag from, Tag to) {
+        to.setName(from.getName());
+        to.setColor(from.getColor());
+        to.setDescription(from.getDescription());
+        to.setCategory(from.getCategory());
+        to.setSortOrder(from.getSortOrder());
     }
 
     /** Poistaa tagin ja irrottaa sen kaikista tehtävistä. */

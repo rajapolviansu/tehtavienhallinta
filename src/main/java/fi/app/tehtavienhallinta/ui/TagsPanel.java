@@ -49,6 +49,10 @@ public class TagsPanel extends VerticalLayout {
         grid.addColumn(Tag::getName).setHeader("Nimi").setFlexGrow(2)
                 .setComparator(Comparator.comparing(Tag::getName, String.CASE_INSENSITIVE_ORDER));
         grid.addColumn(new ComponentRenderer<>(TagsPanel::colorCell)).setHeader("Väri").setFlexGrow(1);
+        grid.addColumn(t -> t.getCategory() == null ? "" : t.getCategory()).setHeader("Luokka").setFlexGrow(1);
+        grid.addColumn(t -> t.getDescription() == null ? "" : t.getDescription())
+                .setHeader("Kuvaus").setFlexGrow(2);
+        grid.addColumn(Tag::getSortOrder).setHeader("Järjestys").setAutoWidth(true).setFlexGrow(0);
         grid.addColumn(new ComponentRenderer<>(tag ->
                 Ui.rowActions(() -> openDialog(tag), () -> confirmDelete(tag), true)))
                 .setHeader("").setAutoWidth(true).setFlexGrow(0);

@@ -55,6 +55,11 @@ public class UsersPanel extends VerticalLayout {
         grid.addColumn(AppUser::getUsername).setHeader("Käyttäjätunnus").setFlexGrow(1)
                 .setComparator(Comparator.comparing(AppUser::getUsername, String.CASE_INSENSITIVE_ORDER));
         grid.addColumn(AppUser::getEmail).setHeader("Sähköposti").setFlexGrow(2);
+        grid.addColumn(u -> u.getProfile() == null ? "" : u.getProfile().getFullName())
+                .setHeader("Nimi (profiili)").setFlexGrow(1);
+        grid.addColumn(u -> u.getProfile() == null || u.getProfile().getJobTitle() == null
+                        ? "" : u.getProfile().getJobTitle())
+                .setHeader("Tehtävänimike").setFlexGrow(1);
         grid.addColumn(u -> u.getRole().name()).setHeader("Rooli").setAutoWidth(true).setFlexGrow(0);
         grid.addColumn(u -> DATE.format(u.getCreated())).setHeader("Luotu").setAutoWidth(true)
                 .setFlexGrow(0).setComparator(Comparator.comparing(AppUser::getCreated));

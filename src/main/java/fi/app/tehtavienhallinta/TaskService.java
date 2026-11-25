@@ -69,6 +69,8 @@ public class TaskService {
         task.setTitle(changes.getTitle());
         task.setDescription(changes.getDescription());
         task.setDueDate(changes.getDueDate());
+        task.setPriority(changes.getPriority());
+        task.setEstimatedHours(changes.getEstimatedHours());
         task.setDone(changes.isDone());
         return tasks.save(task);
     }

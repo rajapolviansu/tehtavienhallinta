@@ -4,6 +4,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -36,23 +37,41 @@ class TagDialog extends Dialog {
         name.setMaxLength(50);
         TextField color = new TextField("Väri");
         color.setPlaceholder("#e53935");
-        color.setHelperText("Valinnainen, muodossa #rrggbb");
+        color.setHelperText("Muodossa #rrggbb");
         color.setMaxLength(7);
+        TextField description = new TextField("Kuvaus");
+        description.setMaxLength(200);
+        TextField category = new TextField("Luokka");
+        category.setMaxLength(30);
+        IntegerField sortOrder = new IntegerField("Järjestys (0-999)");
+        sortOrder.setMin(0);
+        sortOrder.setMax(999);
+        sortOrder.setStepButtonsVisible(true);
 
-        binder.forField(name).asRequired("Nimi on pakollinen").bind("name");
+        binder.forField(name).asRequired("Nimi on pakollinen")
+                .withValidator(n -> n.trim().length() >= 2, "Nimen tulee olla vähintään 2 merkkiä")
+                .bind("name");
         binder.forField(color)
-                .withConverter(s -> s == null || s.isBlank() ? null : s.trim(), s -> s == null ? "" : s)
-                .withValidator(c -> c == null || c.matches(COLOR_PATTERN),
+                .asRequired("Väri on pakollinen")
+                .withValidator(c -> c.trim().matches(COLOR_PATTERN),
                         "Anna väri muodossa #rrggbb, esim. #e53935")
                 .bind("color");
+        binder.forField(description).bind("description");
+        binder.forField(category).bind("category");
+        binder.forField(sortOrder).asRequired("Järjestys on pakollinen")
+                .withValidator(v -> v >= 0 && v <= 999, "Järjestyksen tulee olla 0-999")
+                .bind(Tag::getSortOrder, (t, v) -> t.setSortOrder(v));
 
         if (existing != null) {
             working.setName(existing.getName());
             working.setColor(existing.getColor());
+            working.setDescription(existing.getDescription());
+            working.setCategory(existing.getCategory());
+            working.setSortOrder(existing.getSortOrder());
         }
         binder.readBean(working);
 
-        add(new FormLayout(name, color));
+        add(new FormLayout(name, color, description, category, sortOrder));
 
         Button save = new Button("Tallenna", e -> save());
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -65,9 +84,9 @@ class TagDialog extends Dialog {
         }
         try {
             if (existing == null) {
-                tags.create(working.getName(), working.getColor());
+                tags.create(working);
             } else {
-                tags.update(existing.getId(), working.getName(), working.getColor());
+                tags.update(existing.getId(), working);
             }
         } catch (RuntimeException ex) {
             Ui.error("Tallennus epäonnistui: " + ex.getMessage());
