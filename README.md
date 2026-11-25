@@ -57,7 +57,7 @@ H2-konsoli on käytössä kehityksessä osoitteessa `/h2-console`. JDBC-osoite o
 .\mvnw.cmd test
 ```
 
-Testit kattavat palvelut (käyttäjät, projektit, tehtävät, tunnisteet, haku) ja kirjautumisen.
+Testit kattavat palvelut (käyttäjät, projektit, tehtävät, tunnisteet, haku), kirjautumisen, käyttäjän ja profiilin 1:1-relaation sekä entiteettien validoinnit.
 
 ## Projektin rakenne
 
@@ -65,7 +65,7 @@ Kaikki koodi on paketissa `src/main/java/fi/app/tehtavienhallinta/`.
 
 | Tiedosto | Tehtävä |
 | --- | --- |
-| `AppUser`, `Project`, `Task`, `Tag` | Tietomallin luokat |
+| `AppUser`, `UserProfile`, `Project`, `Task`, `Tag` | Tietomallin luokat |
 | `*Repository` | Tietokantahaut |
 | `*Service` | Sovelluksen toiminnot (lisäys, muokkaus, poisto, haku) |
 | `TaskFilter`, `TaskSpecifications` | Tehtävien suodatus |
@@ -85,12 +85,19 @@ Asetukset ovat tiedostossa `src/main/resources/application.properties`.
 
 ## Tietomalli
 
-- **AppUser**: käyttäjätunnus, sähköposti, salasanatiiviste ja rooli (USER tai ADMIN). Käyttäjätunnus ja sähköposti ovat yksilöllisiä.
-- **Project**: nimi (pakollinen), kuvaus, alku- ja eräpäivä, arkistointi.
-- **Task**: otsikko (pakollinen), kuvaus, eräpäivä, valmis-tieto.
-- **Tag**: nimi ja väri.
-- Projektilla on monta tehtävää. Projektin poisto poistaa myös sen tehtävät.
-- Tehtävällä voi olla monta tunnistetta, ja tunniste voi olla monella tehtävällä.
+Entiteetit ja niiden validoitavat kentät (Bean Validation, lomakkeilla vastaavat tarkistukset suomenkielisin virheilmoituksin):
+
+- **AppUser**: käyttäjätunnus (3–50 merkkiä, vain kirjaimia, numeroita ja `. _ -`), sähköposti, salasanatiiviste, rooli (USER tai ADMIN) ja luontiaika. Käyttäjätunnus ja sähköposti ovat yksilöllisiä.
+- **UserProfile**: koko nimi (pakollinen, 2–100 merkkiä), puhelin, tehtävänimike, verkkosivu (`http://` tai `https://`) ja esittely (enintään 500 merkkiä).
+- **Project**: nimi (pakollinen, vähintään 3 merkkiä), kuvaus, alkupäivä ja eräpäivä (pakollisia, eräpäivä ei voi olla ennen alkua), budjetti (ei negatiivinen, enintään 2 desimaalia) sekä arkistointi.
+- **Task**: otsikko (pakollinen, vähintään 3 merkkiä), kuvaus, eräpäivä (pakollinen), tärkeys (1–5), arvioitu työmäärä (0–1000 h) ja valmis-tieto.
+- **Tag**: nimi (pakollinen, 2–50 merkkiä, yksilöllinen), väri (pakollinen, muoto `#rrggbb`), kuvaus, luokka ja järjestys (0–999).
+
+Relaatiot:
+
+- **1:1** AppUser – UserProfile. Profiili luodaan ja poistetaan käyttäjän mukana. Näkyy Käyttäjät-välilehden gridissä (nimi ja tehtävänimike).
+- **1:N** Project – Task. Projektilla on monta tehtävää, ja projektin poisto poistaa myös sen tehtävät. Näkyy tehtävälistan Projekti-sarakkeessa.
+- **M:N** Task – Tag. Tehtävällä voi olla monta tunnistetta, ja tunniste voi olla monella tehtävällä. Näkyy tehtävälistan Tunnisteet-sarakkeessa.
 
 ## Tekemättä
 
