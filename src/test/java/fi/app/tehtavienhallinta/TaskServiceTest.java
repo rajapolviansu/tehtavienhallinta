@@ -32,12 +32,15 @@ class TaskServiceTest {
     @BeforeEach
     void setUp() {
         Project p = new Project();
+        p.setStartDate(java.time.LocalDate.of(2026, 1, 1));
+        p.setDueDate(java.time.LocalDate.of(2026, 12, 31));
         p.setName("Testiprojekti");
         project = projects.create(p);
     }
 
     private Task newTask(String title) {
         Task t = new Task();
+        t.setDueDate(java.time.LocalDate.of(2026, 6, 1));
         t.setTitle(title);
         return service.create(project.getId(), t);
     }
@@ -54,7 +57,8 @@ class TaskServiceTest {
     @Test
     void createWithMissingProjectThrows() {
         Task t = new Task();
-        t.setTitle("X");
+        t.setDueDate(java.time.LocalDate.of(2026, 6, 1));
+        t.setTitle("Xxx");
         assertThrows(EntityNotFoundException.class, () -> service.create(-1L, t));
     }
 
@@ -62,6 +66,7 @@ class TaskServiceTest {
     void updateChangesFields() {
         Task t = newTask("Vanha");
         Task changes = new Task();
+        changes.setDueDate(java.time.LocalDate.of(2026, 6, 1));
         changes.setTitle("Uusi");
         changes.setDescription("kuvaus");
         changes.setDueDate(LocalDate.of(2026, 5, 1));
@@ -78,7 +83,7 @@ class TaskServiceTest {
 
     @Test
     void setDoneTogglesState() {
-        Task t = newTask("T");
+        Task t = newTask("Tehtävä");
 
         assertTrue(service.setDone(t.getId(), true).isDone());
         assertFalse(service.setDone(t.getId(), false).isDone());
@@ -86,8 +91,10 @@ class TaskServiceTest {
 
     @Test
     void moveToProjectChangesProject() {
-        Task t = newTask("T");
+        Task t = newTask("Tehtävä");
         Project other = new Project();
+        other.setStartDate(java.time.LocalDate.of(2026, 1, 1));
+        other.setDueDate(java.time.LocalDate.of(2026, 12, 31));
         other.setName("Toinen");
         projects.create(other);
 
@@ -101,8 +108,8 @@ class TaskServiceTest {
 
     @Test
     void addAndRemoveTag() {
-        Task t = newTask("T");
-        Tag tag = tags.create("testitagi", null);
+        Task t = newTask("Tehtävä");
+        Tag tag = tags.create("testitagi", "#cccccc");
 
         service.addTag(t.getId(), tag.getId());
         em.flush();
@@ -115,10 +122,11 @@ class TaskServiceTest {
 
     @Test
     void createWithTagsSetsTags() {
-        Tag a = tags.create("tagi-a", null);
-        Tag b = tags.create("tagi-b", null);
+        Tag a = tags.create("tagi-a", "#cccccc");
+        Tag b = tags.create("tagi-b", "#cccccc");
         Task data = new Task();
-        data.setTitle("T");
+        data.setDueDate(java.time.LocalDate.of(2026, 6, 1));
+        data.setTitle("Tehtävä");
 
         Task t = service.create(project.getId(), data, Set.of(a.getId(), b.getId()));
         em.flush();
@@ -129,17 +137,21 @@ class TaskServiceTest {
 
     @Test
     void updateWithRelationsChangesProjectAndSyncsTags() {
-        Tag a = tags.create("tagi-a", null);
-        Tag b = tags.create("tagi-b", null);
+        Tag a = tags.create("tagi-a", "#cccccc");
+        Tag b = tags.create("tagi-b", "#cccccc");
         Task data = new Task();
+        data.setDueDate(java.time.LocalDate.of(2026, 6, 1));
         data.setTitle("Vanha");
         Task t = service.create(project.getId(), data, Set.of(a.getId()));
         Project other = new Project();
+        other.setStartDate(java.time.LocalDate.of(2026, 1, 1));
+        other.setDueDate(java.time.LocalDate.of(2026, 12, 31));
         other.setName("Toinen");
         projects.create(other);
         em.flush();
 
         Task changes = new Task();
+        changes.setDueDate(java.time.LocalDate.of(2026, 6, 1));
         changes.setTitle("Uusi");
         service.update(t.getId(), changes, other.getId(), Set.of(b.getId()));
         em.flush();
@@ -154,8 +166,9 @@ class TaskServiceTest {
 
     @Test
     void searchLoadsProjectAndTagsForDisplayOutsideTransaction() {
-        Tag a = tags.create("tagi-a", null);
+        Tag a = tags.create("tagi-a", "#cccccc");
         Task data = new Task();
+        data.setDueDate(java.time.LocalDate.of(2026, 6, 1));
         data.setTitle("Näytettävä");
         service.create(project.getId(), data, Set.of(a.getId()));
         em.flush();
@@ -170,7 +183,7 @@ class TaskServiceTest {
 
     @Test
     void deleteRemovesTask() {
-        Task t = newTask("T");
+        Task t = newTask("Tehtävä");
         em.flush();
 
         service.delete(t.getId());

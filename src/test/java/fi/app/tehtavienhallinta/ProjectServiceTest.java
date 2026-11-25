@@ -24,6 +24,8 @@ class ProjectServiceTest {
 
     private Project newProject(String name) {
         Project p = new Project();
+        p.setStartDate(java.time.LocalDate.of(2026, 1, 1));
+        p.setDueDate(java.time.LocalDate.of(2026, 12, 31));
         p.setName(name);
         return service.create(p);
     }
@@ -41,6 +43,8 @@ class ProjectServiceTest {
     void updateChangesFields() {
         Project p = newProject("Vanha");
         Project changes = new Project();
+        changes.setStartDate(java.time.LocalDate.of(2026, 1, 1));
+        changes.setDueDate(java.time.LocalDate.of(2026, 12, 31));
         changes.setName("Uusi nimi");
         changes.setDescription("kuvaus");
         changes.setStartDate(LocalDate.of(2026, 1, 1));
@@ -73,7 +77,8 @@ class ProjectServiceTest {
     void deleteRemovesProjectAndItsTasks() {
         Project p = newProject("Poistettava");
         Task t = new Task();
-        t.setTitle("T");
+        t.setDueDate(java.time.LocalDate.of(2026, 6, 1));
+        t.setTitle("Tehtävä");
         tasks.create(p.getId(), t);
         em.flush();
 

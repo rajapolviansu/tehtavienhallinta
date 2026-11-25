@@ -35,9 +35,11 @@ class TaskSearchTest {
     @BeforeEach
     void setUp() {
         Project p = new Project();
+        p.setStartDate(java.time.LocalDate.of(2026, 1, 1));
+        p.setDueDate(java.time.LocalDate.of(2026, 12, 31));
         p.setName("Hakutestit");
         project = projects.create(p);
-        tag = tags.create("hakutagi", null);
+        tag = tags.create("hakutagi", "#cccccc");
 
         a = task("Kirjoita raportti", "Loppuraportti", LocalDate.of(2026, 3, 1), false);
         b = task("Korjaa bugi", null, LocalDate.of(2026, 3, 10), true);

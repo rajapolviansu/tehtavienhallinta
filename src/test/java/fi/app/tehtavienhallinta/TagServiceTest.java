@@ -33,15 +33,15 @@ class TagServiceTest {
 
     @Test
     void createRejectsDuplicateNameIgnoringCase() {
-        service.create("testitagi", null);
+        service.create("testitagi", "#cccccc");
 
-        assertThrows(IllegalArgumentException.class, () -> service.create("TESTITAGI", null));
+        assertThrows(IllegalArgumentException.class, () -> service.create("TESTITAGI", "#cccccc"));
     }
 
     @Test
     void updateChangesFieldsAndRejectsExistingName() {
         Tag a = service.create("tagi-a", "#111111");
-        service.create("tagi-b", null);
+        service.create("tagi-b", "#cccccc");
 
         service.update(a.getId(), "tagi-a2", "#222222");
         assertEquals("tagi-a2", service.get(a.getId()).getName());
@@ -52,12 +52,15 @@ class TagServiceTest {
 
     @Test
     void deleteDetachesTagFromTasks() {
-        Tag tag = service.create("poistettava", null);
+        Tag tag = service.create("poistettava", "#cccccc");
         Project p = new Project();
-        p.setName("P");
+        p.setStartDate(java.time.LocalDate.of(2026, 1, 1));
+        p.setDueDate(java.time.LocalDate.of(2026, 12, 31));
+        p.setName("Projekti");
         projects.create(p);
         Task task = new Task();
-        task.setTitle("T");
+        task.setDueDate(java.time.LocalDate.of(2026, 6, 1));
+        task.setTitle("Tehtävä");
         tasks.create(p.getId(), task);
         tasks.addTag(task.getId(), tag.getId());
         em.flush();
