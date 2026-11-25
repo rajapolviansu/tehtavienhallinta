@@ -1,0 +1,25 @@
+.project-detail-view vaadin-split-layout {
+  box-sizing: border-box;
+  max-width: 100%;
+  border-radius: var(--lumo-border-radius-m);
+  border: 2px solid var(--app-green-100);
+}
+
+.project-detail-view .project-detail-panel {
+  background: #fff;
+  overflow: auto;
+}
+
+.project-detail-view .project-detail-panel h2 {
+  margin: 0;
+  color: var(--app-green-900);
+}
+
+.project-detail-view .project-dates {
+  display: flex;
+  gap: var(--lumo-space-l);
+  padding: var(--lumo-space-s) var(--lumo-space-m);
+  background: var(--app-green-100);
+  border-radius: var(--lumo-border-radius-m);
+  color: var(--app-green-900);
+}

@@ -10,8 +10,9 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.PermitAll;
 import fi.app.tehtavienhallinta.Tag;
 import fi.app.tehtavienhallinta.TagService;
 
@@ -20,14 +21,15 @@ import java.util.Comparator;
 /**
  * Tunnisteiden lista: lisäys, muokkaus ja poisto (poisto irrottaa tunnisteen kaikista tehtävistä).
  */
-@SpringComponent
-@UIScope
-public class TagsPanel extends VerticalLayout {
+@Route(value = "tunnisteet", layout = MainLayout.class)
+@PageTitle("Tunnisteet | Tehtävienhallinta")
+@PermitAll
+public class TagsView extends VerticalLayout {
 
     private final TagService tags;
     private final Grid<Tag> grid = new Grid<>(Tag.class, false);
 
-    public TagsPanel(TagService tags) {
+    public TagsView(TagService tags) {
         this.tags = tags;
 
         setSizeFull();
@@ -48,7 +50,7 @@ public class TagsPanel extends VerticalLayout {
 
         grid.addColumn(Tag::getName).setHeader("Nimi").setFlexGrow(2)
                 .setComparator(Comparator.comparing(Tag::getName, String.CASE_INSENSITIVE_ORDER));
-        grid.addColumn(new ComponentRenderer<>(TagsPanel::colorCell)).setHeader("Väri").setFlexGrow(1);
+        grid.addColumn(new ComponentRenderer<>(TagsView::colorCell)).setHeader("Väri").setFlexGrow(1);
         grid.addColumn(t -> t.getCategory() == null ? "" : t.getCategory()).setHeader("Luokka").setFlexGrow(1);
         grid.addColumn(t -> t.getDescription() == null ? "" : t.getDescription())
                 .setHeader("Kuvaus").setFlexGrow(2);

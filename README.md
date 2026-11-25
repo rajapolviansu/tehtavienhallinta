@@ -98,12 +98,12 @@ Kaikki koodi on paketissa `src/main/java/fi/app/tehtavienhallinta/`.
 | `AppUserDetailsService` | Hakee kirjautuvan käyttäjän tietokannasta |
 | `TestDataLoader` | Lataa kehityksessä esimerkkidatan |
 | `ui/LoginView` | Kirjautumissivu |
-| `ui/MainView` | Pääsivu: otsikko, uloskirjautuminen ja välilehdet |
-| `ui/TasksPanel` | Tehtävälista: haku, lisäys, muokkaus ja poisto |
+| `ui/MainLayout` | AppLayout: header, sivuvalikko ja footer; kaikki näkymät käyttävät `@Route(layout = MainLayout.class)` |
+| `ui/TasksView` | Tehtävälista: haku, lisäys, muokkaus ja poisto |
 | `ui/TaskDialog` | Tehtävän lisäys- ja muokkauslomake |
-| `ui/ProjectsPanel`, `ui/ProjectDialog` | Projektilista ja projektin lomake |
-| `ui/TagsPanel`, `ui/TagDialog` | Tunnisteiden lista ja tunnisteen lomake |
-| `ui/UsersPanel`, `ui/UserDialog` | Käyttäjien hallinta (vain ylläpitäjälle) |
+| `ui/ProjectsView`, `ui/ProjectDialog` | Projektilista ja projektin lomake |
+| `ui/TagsView`, `ui/TagDialog` | Tunnisteiden lista ja tunnisteen lomake |
+| `ui/UsersView`, `ui/UserDialog` | Käyttäjien hallinta (vain ylläpitäjälle) |
 | `ui/Ui` | Yhteiset ilmoitukset ja poistovahvistus |
 
 Asetukset ovat tiedostossa `src/main/resources/application.properties`.

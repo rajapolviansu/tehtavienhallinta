@@ -12,8 +12,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.PermitAll;
 import fi.app.tehtavienhallinta.ProjectService;
 import fi.app.tehtavienhallinta.Tag;
 import fi.app.tehtavienhallinta.TagService;
@@ -28,9 +29,10 @@ import java.util.stream.Collectors;
 /**
  * Tehtävälista: haku, lisäys, muokkaus ja poisto (poisto vahvistetaan).
  */
-@SpringComponent
-@UIScope
-public class TasksPanel extends VerticalLayout {
+@Route(value = "", layout = MainLayout.class)
+@PageTitle("Tehtävät | Tehtävienhallinta")
+@PermitAll
+public class TasksView extends VerticalLayout {
 
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("d.M.yyyy");
 
@@ -42,7 +44,7 @@ public class TasksPanel extends VerticalLayout {
     private final TextField search = new TextField();
     private final Checkbox onlyOpen = new Checkbox("Vain keskeneräiset");
 
-    public TasksPanel(TaskService tasks, ProjectService projects, TagService tags) {
+    public TasksView(TaskService tasks, ProjectService projects, TagService tags) {
         this.tasks = tasks;
         this.projects = projects;
         this.tags = tags;

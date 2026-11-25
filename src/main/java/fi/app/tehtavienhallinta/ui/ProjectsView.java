@@ -8,8 +8,9 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.PermitAll;
 import fi.app.tehtavienhallinta.Project;
 import fi.app.tehtavienhallinta.ProjectService;
 
@@ -19,16 +20,17 @@ import java.util.Comparator;
 /**
  * Projektilista: lisäys, muokkaus ja poisto (poisto vahvistetaan, ja se poistaa myös projektin tehtävät).
  */
-@SpringComponent
-@UIScope
-public class ProjectsPanel extends VerticalLayout {
+@Route(value = "projektit", layout = MainLayout.class)
+@PageTitle("Projektit | Tehtävienhallinta")
+@PermitAll
+public class ProjectsView extends VerticalLayout {
 
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("d.M.yyyy");
 
     private final ProjectService projects;
     private final Grid<Project> grid = new Grid<>(Project.class, false);
 
-    public ProjectsPanel(ProjectService projects) {
+    public ProjectsView(ProjectService projects) {
         this.projects = projects;
 
         setSizeFull();

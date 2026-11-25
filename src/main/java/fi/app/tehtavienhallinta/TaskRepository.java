@@ -15,6 +15,11 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
     @EntityGraph(attributePaths = {"project", "tags"})
     List<Task> findAll(Specification<Task> spec, Sort sort);
 
+    /** Hakee projektin mukaan, jotta esim. taulunäkymä voi näyttää sen nimen transaktion jälkeen. */
+    @Override
+    @EntityGraph(attributePaths = {"project"})
+    List<Task> findAll();
+
     List<Task> findByProjectIdOrderByDueDateAsc(Long projectId);
 
     List<Task> findByProjectIdAndDoneFalse(Long projectId);
