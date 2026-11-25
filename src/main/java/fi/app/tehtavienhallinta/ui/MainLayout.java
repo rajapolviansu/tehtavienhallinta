@@ -15,6 +15,7 @@ import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import jakarta.annotation.security.PermitAll;
 
 import java.time.Year;
 
@@ -24,6 +25,7 @@ import java.time.Year;
  * {@code @Route(value, layout = MainLayout.class)}-määrityksellä, ja vain sisältöalue vaihtuu
  * navigoitaessa.
  */
+@PermitAll
 public class MainLayout extends AppLayout {
 
     public MainLayout(AuthenticationContext authContext) {
@@ -63,6 +65,9 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation(AuthenticationContext authContext) {
         SideNav nav = new SideNav();
         nav.addItem(new SideNavItem("Tehtävät", TasksView.class, VaadinIcon.TASKS.create()));
+        nav.addItem(new SideNavItem("Kojelauta", DashboardView.class, VaadinIcon.DASHBOARD.create()));
+        nav.addItem(new SideNavItem("Taulu", BoardView.class, VaadinIcon.GRID_BIG.create()));
+        nav.addItem(new SideNavItem("Projektinäkymä", ProjectDetailView.class, VaadinIcon.SPLIT.create()));
         nav.addItem(new SideNavItem("Haku", SearchView.class, VaadinIcon.SEARCH.create()));
         nav.addItem(new SideNavItem("Projektit", ProjectsView.class, VaadinIcon.FOLDER.create()));
         nav.addItem(new SideNavItem("Tunnisteet", TagsView.class, VaadinIcon.TAGS.create()));

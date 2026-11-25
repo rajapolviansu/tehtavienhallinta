@@ -45,7 +45,9 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.with(VaadinSecurityConfigurer.vaadin(), configurer -> configurer.loginView(LoginView.class));
+        // Näkymäkohtaiset tyylitiedostot (@StyleSheet) ovat julkisia staattisia resursseja
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/*-view.css", "/project-detail.css").permitAll());
+        http.with(VaadinSecurityConfigurer.vaadin(),configurer -> configurer.loginView(LoginView.class));
         return http.build();
     }
 }
