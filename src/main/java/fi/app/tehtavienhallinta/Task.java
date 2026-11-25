@@ -11,7 +11,10 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
@@ -27,7 +30,7 @@ public class Task {
     private Long id;
 
     @NotBlank
-    @Size(max = 200)
+    @Size(min = 3, max = 200)
     @Column(nullable = false, length = 200)
     private String title;
 
@@ -35,7 +38,18 @@ public class Task {
     @Column(length = 2000)
     private String description;
 
+    @NotNull
     private LocalDate dueDate;
+
+    /** Tärkeys 1 (matala) – 5 (kriittinen). */
+    @Min(1)
+    @Max(5)
+    @Column(nullable = false)
+    private int priority = 3;
+
+    @Min(0)
+    @Max(1000)
+    private Integer estimatedHours;
 
     @Column(nullable = false)
     private boolean done = false;
@@ -77,6 +91,22 @@ public class Task {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public Integer getEstimatedHours() {
+        return estimatedHours;
+    }
+
+    public void setEstimatedHours(Integer estimatedHours) {
+        this.estimatedHours = estimatedHours;
     }
 
     public boolean isDone() {
