@@ -9,6 +9,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 /**
@@ -30,7 +31,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         login.setAction("login");
         login.setI18n(finnishI18n());
 
-        add(new H1("Tehtävienhallinta"), login);
+        add(new H1("Tehtävienhallinta"), login,
+                new RouterLink("Ei vielä tunnusta? Rekisteröidy", RegisterView.class));
     }
 
     @Override
