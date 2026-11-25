@@ -37,8 +37,8 @@ class ProjectDialog extends Dialog {
         name.setMaxLength(200);
         TextArea description = new TextArea("Kuvaus");
         description.setMaxLength(2000);
-        DatePicker start = new DatePicker("Alkupäivä");
-        DatePicker due = new DatePicker("Eräpäivä");
+        DatePicker start = new FinnishDatePicker("Alkupäivä");
+        DatePicker due = new FinnishDatePicker("Eräpäivä");
         Checkbox archived = new Checkbox("Arkistoitu");
 
         binder.forField(name).asRequired("Nimi on pakollinen").bind("name");

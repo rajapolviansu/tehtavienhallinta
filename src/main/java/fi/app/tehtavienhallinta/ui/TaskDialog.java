@@ -48,7 +48,7 @@ class TaskDialog extends Dialog {
         title.setMaxLength(200);
         TextArea description = new TextArea("Kuvaus");
         description.setMaxLength(2000);
-        DatePicker dueDate = new DatePicker("Eräpäivä");
+        DatePicker dueDate = new FinnishDatePicker("Eräpäivä");
         Checkbox done = new Checkbox("Valmis");
 
         ComboBox<Project> project = new ComboBox<>("Projekti");
