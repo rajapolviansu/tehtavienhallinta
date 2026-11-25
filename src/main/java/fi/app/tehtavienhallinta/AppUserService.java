@@ -26,6 +26,15 @@ public class AppUserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Itserekisteröityminen: avoin kaikille, mutta luo aina tavallisen käyttäjän (rooli USER),
+     * jottei rekisteröityjä voi korottaa ylläpitäjäksi.
+     */
+    @PreAuthorize("permitAll()")
+    public AppUser register(String username, String email, String rawPassword) {
+        return create(username, email, rawPassword, Role.USER, null);
+    }
+
     /** Luo tavallisen käyttäjän (rooli USER). */
     public AppUser create(String username, String email, String rawPassword) {
         return create(username, email, rawPassword, Role.USER);
